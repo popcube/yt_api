@@ -1,0 +1,34 @@
+{
+  "account": "pj_sekai",
+  "fetch_time": "S",
+  "view_25": {
+    "views": "N",
+    "likes": "N",
+    "comments": "N",
+    "videos": [
+      {
+        "id": "S",
+        "title": "S",
+        "date": "S",
+        "views": "N",
+        "likes": "N",
+        "comments": "N"
+      }
+    ]
+  },
+  "date_25": {
+    "views": "N",
+    "likes": "N",
+    "comments": "N",
+    "videos": [
+      {
+        "id": "S",
+        "title": "S",
+        "date": "S",
+        "views": "N",
+        "likes": "N",
+        "comments": "N"
+      }
+    ]
+  }
+}
