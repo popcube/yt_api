@@ -8,7 +8,7 @@ def main():
   
   last_items_dict = table.query(
     KeyConditionExpression=Key("account").eq("pj_sekai"),
-    ScanIndexForward=True,
+    ScanIndexForward=False,
     Limit=1,
     # ExpressionAttributeNames={"#yr": "year"},
     FilterExpression=(

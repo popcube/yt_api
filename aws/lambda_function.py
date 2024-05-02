@@ -16,7 +16,7 @@ def lambda_handler(event, context):
   if event.get("event") != "hourly_update":
     last_items_dict = table.query(
       KeyConditionExpression=boto3.dynamodb.conditions.Key("account").eq("pj_sekai"),
-      ScanIndexForward=True,
+      ScanIndexForward=False,
       Limit=1,
       # ReturnConsumedCapacity="INDEXES"
     )
