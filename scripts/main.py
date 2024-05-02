@@ -11,6 +11,8 @@ def main():
     Limit=1,
     # ReturnConsumedCapacity="INDEXES"
   )
+  
+  print(last_items_dict)
 
 if __name__ == "__main__":
   main()

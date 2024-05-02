@@ -16,4 +16,4 @@ jobs:
 
     - name: main
       run: |
-        python ./main.py
+        python ./scripts/main.py
