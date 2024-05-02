@@ -15,7 +15,7 @@ def main():
     KeyConditionExpression=(
         Key("account").eq("pj_sekai") &
         Key("view_25.videos[0].date").gt("") &
-        Key("view_25.videos[0].title").gt()
+        Key("view_25.videos[0].title").gt("")
       ),
     ReturnConsumedCapacity="INDEXES"
     )
