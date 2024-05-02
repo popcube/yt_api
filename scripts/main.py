@@ -10,7 +10,6 @@ def main():
     KeyConditionExpression=Key("account").eq("pj_sekai"),
     ScanIndexForward=True,
     Limit=1,
-    ProjectionExpression="view_25, date_25",
     # ExpressionAttributeNames={"#yr": "year"},
     FilterExpression=(
         Attr("view_25.videos[0].date").exists() &
