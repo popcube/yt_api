@@ -1,4 +1,5 @@
 import boto3
+from boto3.dynamodb.conditions import Key, Attr
 from datetime import datetime
 
 def main():
@@ -6,11 +7,17 @@ def main():
   table = dynamodb.Table('yt_main')
   
   last_items_dict = table.query(
-    KeyConditionExpression=boto3.dynamodb.conditions.Key("account").eq("pj_sekai"),
+    KeyConditionExpression=Key("account").eq("pj_sekai"),
     ScanIndexForward=True,
     Limit=1,
-    # ReturnConsumedCapacity="INDEXES"
-  )
+    ProjectionExpression="view_25, date_25",
+    # ExpressionAttributeNames={"#yr": "year"},
+    KeyConditionExpression=(
+      Attr("view_25.videos[0].date").exists()
+      & Attr("view_25.videos[0].title").exists()
+      ),
+    ReturnConsumedCapacity="INDEXES"
+    )
   
   print(last_items_dict)
 
