@@ -9,7 +9,7 @@ def main():
   last_items_dict = table.query(
     KeyConditionExpression=Key("account").eq("pj_sekai"),
     ScanIndexForward=False,
-    Limit=1,
+    Limit=120,
     # ExpressionAttributeNames={"#yr": "year"},
     FilterExpression=(
         Attr("view_25.videos[0].date").exists() &
