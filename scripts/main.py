@@ -14,8 +14,8 @@ def main():
     # ExpressionAttributeNames={"#yr": "year"},
     KeyConditionExpression=(
         Key("account").eq("pj_sekai") &
-        Key("view_25.videos[0].date").exists() &
-        Key("view_25.videos[0].title").exists()
+        Key("view_25.videos[0].date").gt("") &
+        Key("view_25.videos[0].title").gt()
       ),
     ReturnConsumedCapacity="INDEXES"
     )
