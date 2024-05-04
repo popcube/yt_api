@@ -15,7 +15,7 @@ def main():
         Attr("view_25.videos[0].date").exists() &
         Attr("view_25.videos[0].title").exists() 
       ),
-    ReturnConsumedCapacity="INDEXES"
+    ReturnConsumedCapacity="TOTAL"
     )
   
   print(len(last_items_dict["Items"]))
