@@ -1,4 +1,5 @@
 import boto3
+from boto3.dynamodb.conditions import Attr
 from datetime import datetime
 
 from yt_main import main as yt_main
@@ -18,6 +19,10 @@ def lambda_handler(event, context):
       KeyConditionExpression=boto3.dynamodb.conditions.Key("account").eq("pj_sekai"),
       ScanIndexForward=False,
       Limit=1,
+      # FilterExpression=(
+      #   Attr("view_25.videos[0].date").exists() &
+      #   Attr("view_25.videos[0].title").exists() 
+      # ),
       # ReturnConsumedCapacity="INDEXES"
     )
     last_item_dict = last_items_dict["Items"][0]

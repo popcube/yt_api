@@ -18,7 +18,9 @@ def main():
     ReturnConsumedCapacity="INDEXES"
     )
   
-  print(last_items_dict)
+  print(len(last_items_dict["Items"]))
+  print(last_items_dict["Items"][0]["view_25"])
+  print(last_items_dict["Items"][0]["date_25"])
 
 if __name__ == "__main__":
   main()

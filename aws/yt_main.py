@@ -134,16 +134,17 @@ def main(view_ids=[], date_ids=[]):
   # view_25_data = pd.DataFrame()
   # id_50 = pd.Series()
   
-  if len(view_ids) > 0 and len(date_ids) > 0:
+  if len(view_ids):
     date_25_data = pd.DataFrame(date_ids, columns=["id"])
-    view_25_data = pd.DataFrame(view_ids, columns=["id"])
-    id_50 = pd.Series(date_ids + view_ids)
-    
-  else:    
+  else:
     date_25_data = date_25()
-    view_25_data = view_25()    
-    id_50 = pd.concat([date_25_data["id"], view_25_data["id"]], axis="index", ignore_index=True)
-    
+  
+  if len(date_ids) > 0:
+    view_25_data = pd.DataFrame(view_ids, columns=["id"])
+  else:
+    view_25_data = view_25()
+  
+  id_50 = pd.concat([date_25_data["id"], view_25_data["id"]], axis="index", ignore_index=True)    
   id_50.drop_duplicates(inplace=True)
   # print(id_50)
   # sys.exit(0)
