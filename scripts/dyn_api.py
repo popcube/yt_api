@@ -30,7 +30,7 @@ def main():
   table = dynamodb.Table('yt_main')
   scan_param = dict(
     ReturnConsumedCapacity="TOTAL",
-    Limit=20
+    # Limit=20
   )
   scanned_raw = []
   
@@ -56,6 +56,7 @@ def main():
   # print(len(scanned_raw))
   # print(scanned_raw[-1])
   # print(scanned_raw[-1]["fetch_time"])
+  return scanned_raw
 
 if __name__ == "__main__":
   main()

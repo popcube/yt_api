@@ -19,8 +19,8 @@ def main():
   ]
   agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
   
-  plt.plot(agg_list["date"], agg_list["view_25_views"])
-  plt.plot(agg_list["date"], agg_list["date_25_views"])
+  plt.plot(agg_df["date"], agg_df["view_25_views"])
+  plt.plot(agg_df["date"], agg_df["date_25_views"])
   plt.savefig("./test.png")
 
 
