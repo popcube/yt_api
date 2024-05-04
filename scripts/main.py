@@ -9,7 +9,7 @@ def main():
   
   agg_list = [
     [
-      pd.to_datetime(i["fetch_time"]),
+      i["fetch_time"],
       i["view_25"]["views"],
       i["view_25"]["likes"],
       i["view_25"]["comments"],
@@ -20,11 +20,14 @@ def main():
     for i in scanned_data
   ]
   agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
+  agg_df["date"] = pd.to_datetime(agg_df["date"])
   agg_diff_df = pd.concat([
     agg_df["date"],
     agg_df["view_25_views"].diff(),
     agg_df["date_25_views"].diff(),
-  ], axis="columns").dropna(how="any")
+  ], axis="columns")
+  
+  print(agg_diff_df)
   
   
   make_timeline(agg_df["date"], agg_df["view_25_views"], figname="view_25_views")
