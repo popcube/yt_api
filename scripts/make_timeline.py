@@ -133,6 +133,7 @@ def make_timeline(
         plt.gca().xaxis.set_minor_formatter(mdates.DateFormatter('%H'))
 
     if y_range != 0:
+        print(y_range) #DELETEME
         plt.gca().yaxis.set_major_locator(
             ticker.MultipleLocator(max(5*(y_range//60), 1)))
         plt.gca().yaxis.set_minor_locator(
