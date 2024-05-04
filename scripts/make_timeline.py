@@ -133,7 +133,7 @@ def make_timeline(
         plt.gca().xaxis.set_minor_formatter(mdates.DateFormatter('%H'))
 
     if y_range != 0:
-        print(y_range)
+        print(type(y_range))
         print(max(5*(y_range//60), 1))
         print(max(y_range//60, 1) * 1)
         plt.gca().yaxis.set_major_locator(
