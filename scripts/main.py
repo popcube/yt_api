@@ -28,9 +28,9 @@ def main():
   ], axis="columns").dropna(how="any")  
   
   make_timeline(agg_df.index, agg_df["view_25_views"], figname="view_25_views")
-  make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views")
-  make_timeline(agg_df.index, agg_df["view_25_views"], figname="view_25_views")
-  make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views")
+  make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views_diff")
+  make_timeline(agg_df.index, agg_df["date_25_views"], figname="date_25_views")
+  make_timeline(agg_diff_df.index, agg_diff_df["date_25_views"], figname="date_25_views_diff")
 
 if __name__ == "__main__":
   main()
