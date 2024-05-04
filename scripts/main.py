@@ -61,7 +61,8 @@ def main():
     sleep(1) # wait 1 sec
   
   print(len(scanned_raw))
-  print(scanned_raw[0])
+  print(scanned_raw[-1])
+  print(scanned_raw[-1]["fetch_time"])
 
 if __name__ == "__main__":
   main()
