@@ -40,9 +40,9 @@ def main():
     if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == 200:
       scanned_raw += scanned_raw_dict["Items"]
       if (scanned_raw_dict.get("LastEvaluatedKey", False)):
-        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, paginating...", flush=True)
+        print(f'data succcessfully scanned. count: {scanned_raw_dict["Count"]}, paginating...', flush=True)
       else:        
-        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, done!", flush=True)
+        print(f'data succcessfully scanned. count: {scanned_raw_dict["Count"]}, done!', flush=True)
         break
     else:
       print("ERROR at scan")

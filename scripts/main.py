@@ -7,8 +7,8 @@ from make_timeline import make_timeline
 
 def main(local=False):
   if local:
-    agg_df = pd.read_csv("./agg_df")
-    agg_diff_df = pd.read_csv("./agg_diff_df")
+    agg_df = pd.read_csv("./agg_df.csv", index_col="date", parse_dates=["date"])
+    agg_diff_df = pd.read_csv("./agg_diff_df.csv", index_col="date", parse_dates=["date"])
   
   else:    
     scanned_data = scan_data()
