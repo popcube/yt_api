@@ -21,11 +21,11 @@ def main():
   
   plt.plot(agg_df["date"], agg_df["view_25_views"])
   plt.savefig("./test_1.png")
-  plt.plot(agg_df["date"], agg_df["view_25_views"].diff().dropna())
+  plt.plot(agg_df["date"].iloc[1:,:], agg_df["view_25_views"].diff().dropna())
   plt.savefig("./test_2.png")
   plt.plot(agg_df["date"], agg_df["date_25_views"])
   plt.savefig("./test_3.png")
-  plt.plot(agg_df["date"], agg_df["date_25_views"].diff().dropna())
+  plt.plot(agg_df["date"].iloc[1:,:], agg_df["date_25_views"].diff().dropna())
   plt.savefig("./test_4.png")
 
 
