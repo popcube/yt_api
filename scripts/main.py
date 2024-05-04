@@ -28,7 +28,7 @@ def main(local=False):
     agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
   agg_df["date"] = pd.to_datetime(agg_df["date"]) + pd.Timedelta(hours=9)
   agg_df.set_index("date", inplace=True)
-  agg_df.map(int)
+  agg_df = agg_df.map(int)
   agg_diff_df = pd.concat([
     agg_df["view_25_views"].diff(),
     agg_df["date_25_views"].diff(),
