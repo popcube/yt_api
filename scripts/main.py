@@ -18,6 +18,8 @@ def main():
     ReturnConsumedCapacity="TOTAL"
     )
   
+  print(last_items_dict["Items"])
+  print()
   print(len(last_items_dict["Items"]))
   print(last_items_dict["Items"][0]["view_25"])
   print(last_items_dict["Items"][0]["date_25"])
