@@ -1,8 +1,9 @@
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from datetime import datetime
+from time import sleep
 
-def main():
+def get_last_hourly_update():
   dynamodb = boto3.resource('dynamodb')
   table = dynamodb.Table('yt_main')
   
@@ -23,6 +24,35 @@ def main():
   print(len(last_items_dict["Items"]))
   print(last_items_dict["Items"][0]["view_25"])
   print(last_items_dict["Items"][0]["date_25"])
+  
+def main():
+  dynamodb = boto3.resource('dynamodb')
+  table = dynamodb.Table('yt_main')
+  scan_param = dict(
+    ScanIndexForward=False,
+    ReturnConsumedCapacity="TOTAL"    
+  )
+  scanned_raw = []
+  
+  while True:
+    scanned_raw_dict = table.scan(**scan_param)
+    print(scanned_raw_dict)
+    print()
+    if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == "200":
+      scanned_raw += scanned_raw_dict
+      if (scanned_raw_dict.get("LastEvaluatedKey", False)):
+        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, paginating...")
+      else:        
+        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, done!")
+        break
+    else:
+      print("ERROR at scan")
+      print(scanned_raw_dict)
+      raise ValueError("ERROR at scan")
+    scan_param["ExclusiveStartKey"] = scanned_raw_dict["LastEvaluatedKey"]
+    sleep(1) # wait 1 sec
+  
+  print(scanned_raw)
 
 if __name__ == "__main__":
   main()
