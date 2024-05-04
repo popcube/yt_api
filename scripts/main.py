@@ -9,7 +9,7 @@ def main():
   
   agg_list = [
     [
-      i["fetch_time"],
+      pd.to_datetime(i["fetch_time"]),
       i["view_25"]["views"],
       i["view_25"]["likes"],
       i["view_25"]["comments"],
