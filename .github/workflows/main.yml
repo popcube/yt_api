@@ -13,7 +13,8 @@ jobs:
     - name: setup
       run: |
         sudo apt-get update
-        sudo apt-get install fonts-ipaexfont     
+        sudo apt-get install fonts-ipaexfont    
+        pip install --upgrade pip  
         pip install -r requirements.txt
 
     - name: main
