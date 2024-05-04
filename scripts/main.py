@@ -29,7 +29,6 @@ def main():
   dynamodb = boto3.resource('dynamodb')
   table = dynamodb.Table('yt_main')
   scan_param = dict(
-    ScanIndexForward=False,
     ReturnConsumedCapacity="TOTAL"    
   )
   scanned_raw = []
