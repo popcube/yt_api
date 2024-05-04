@@ -37,10 +37,11 @@ def main():
   
   while True:
     scanned_raw_dict = table.scan(**scan_param)
-    print(scanned_raw_dict)
+    print(len(scanned_raw_dict["Items"]))
+    print(scanned_raw_dict["LastEvaluatedKey"])
     print()
     
-    scanned_raw_dict.pop["Items"]
+    scanned_raw_dict.pop("Items")
     print(scanned_raw_dict)
     sys.exit(1)
     
