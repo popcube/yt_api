@@ -37,16 +37,16 @@ def main():
   
   while True:
     scanned_raw_dict = table.scan(**scan_param)
-    print(len(scanned_raw_dict["Items"]))
-    print(scanned_raw_dict["LastEvaluatedKey"])
-    print()
+    # print(len(scanned_raw_dict["Items"]))
+    # print(scanned_raw_dict["LastEvaluatedKey"])
+    # print()
     
-    scanned_raw_dict.pop("Items")
-    print(scanned_raw_dict)
-    sys.exit(1)
+    # scanned_raw_dict.pop("Items")
+    # print(scanned_raw_dict)
+    # sys.exit(1)
     
     if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == 200:
-      scanned_raw += scanned_raw_dict
+      scanned_raw += scanned_raw_dict["Items"]
       if (scanned_raw_dict.get("LastEvaluatedKey", False)):
         print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, paginating...", flush=True)
       else:        
@@ -54,7 +54,7 @@ def main():
         break
     else:
       print("ERROR at scan")
-      scanned_raw_dict.pop["Items"]
+      scanned_raw_dict.pop("Items")
       print(scanned_raw_dict)
       raise ValueError("ERROR at scan")
     scan_param["ExclusiveStartKey"] = scanned_raw_dict["LastEvaluatedKey"]
