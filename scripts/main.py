@@ -5,7 +5,7 @@ import sys, os
 from dyn_api import main as scan_data
 from make_timeline import make_timeline
 
-def main(local):
+def main(local=False):
   if local:
     agg_df = pd.read_csv("./agg_df")
     agg_diff_df = pd.read_csv("./agg_diff_df")
@@ -45,4 +45,4 @@ if __name__ == "__main__":
   if os.environ.get("AWS_ACCESS_KEY_ID"):
     main()
   else:
-    main("local")
+    main(local=True)
