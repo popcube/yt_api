@@ -1,4 +1,4 @@
-boto3>=1.28.69
-pandas==2.1.0
-matplotlib==3.5.2
-scipy==1.9.3
+boto3
+pandas
+matplotlib
+scipy
