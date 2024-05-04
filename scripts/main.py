@@ -46,7 +46,7 @@ def main():
         break
     else:
       print("ERROR at scan")
-      # print(scanned_raw_dict)
+      print(scanned_raw_dict)
       raise ValueError("ERROR at scan")
     scan_param["ExclusiveStartKey"] = scanned_raw_dict["LastEvaluatedKey"]
     sleep(1) # wait 1 sec
