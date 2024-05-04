@@ -2,6 +2,7 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from datetime import datetime
 from time import sleep
+import sys
 
 def get_last_hourly_update():
   dynamodb = boto3.resource('dynamodb')
@@ -36,8 +37,13 @@ def main():
   
   while True:
     scanned_raw_dict = table.scan(**scan_param)
-    # print(scanned_raw_dict)
+    print(scanned_raw_dict)
     print()
+    
+    scanned_raw_dict.pop["Items"]
+    print(scanned_raw_dict)
+    sys.exit(1)
+    
     if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == 200:
       scanned_raw += scanned_raw_dict
       if (scanned_raw_dict.get("LastEvaluatedKey", False)):
