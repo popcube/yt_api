@@ -23,6 +23,6 @@ jobs:
         AWS_DEFAULT_REGION: "ap-northeast-1"
 
     - name: upload data
-      uses: action/upload-artifact@v4
+      uses: actions/upload-artifact@v4
       with:
         path: ./test.png
