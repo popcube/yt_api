@@ -21,19 +21,16 @@ def main():
   ]
   agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
   agg_df["date"] = pd.to_datetime(agg_df["date"])
+  agg_df.set_index("date", inplace=True)
   agg_diff_df = pd.concat([
-    agg_df["date"],
     agg_df["view_25_views"].diff(),
     agg_df["date_25_views"].diff(),
-  ], axis="columns")
+  ], axis="columns").dropna(how="any")  
   
-  print(agg_diff_df)
-  
-  
-  make_timeline(agg_df["date"], agg_df["view_25_views"], figname="view_25_views")
-  make_timeline(agg_diff_df["date"], agg_diff_df["view_25_views"], figname="view_25_views")
-  make_timeline(agg_df["date"], agg_df["view_25_views"], figname="view_25_views")
-  make_timeline(agg_diff_df["date"], agg_diff_df["view_25_views"], figname="view_25_views")
+  make_timeline(agg_df.index, agg_df["view_25_views"], figname="view_25_views")
+  make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views")
+  make_timeline(agg_df.index, agg_df["view_25_views"], figname="view_25_views")
+  make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views")
 
 if __name__ == "__main__":
   main()
