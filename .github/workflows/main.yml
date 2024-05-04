@@ -9,7 +9,7 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-        cache: 'pip'
+        # cache: 'pip'
     - name: setup
       run: |
         sudo apt-get update
