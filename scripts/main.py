@@ -35,7 +35,7 @@ def main():
   
   while True:
     scanned_raw_dict = table.scan(**scan_param)
-    print(scanned_raw_dict)
+    # print(scanned_raw_dict)
     print()
     if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == "200":
       scanned_raw += scanned_raw_dict
@@ -46,12 +46,12 @@ def main():
         break
     else:
       print("ERROR at scan")
-      print(scanned_raw_dict)
+      # print(scanned_raw_dict)
       raise ValueError("ERROR at scan")
     scan_param["ExclusiveStartKey"] = scanned_raw_dict["LastEvaluatedKey"]
     sleep(1) # wait 1 sec
   
-  print(scanned_raw)
+  # print(scanned_raw)
 
 if __name__ == "__main__":
   main()
