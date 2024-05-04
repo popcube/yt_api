@@ -30,7 +30,7 @@ def main():
   table = dynamodb.Table('yt_main')
   scan_param = dict(
     ReturnConsumedCapacity="TOTAL",
-    Limit=1
+    Limit=20
   )
   scanned_raw = []
   
@@ -41,9 +41,9 @@ def main():
     if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == 200:
       scanned_raw += scanned_raw_dict
       if (scanned_raw_dict.get("LastEvaluatedKey", False)):
-        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, paginating...")
+        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, paginating...", flush=True)
       else:        
-        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, done!")
+        print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, done!", flush=True)
         break
     else:
       print("ERROR at scan")
@@ -54,7 +54,7 @@ def main():
     sleep(1) # wait 1 sec
   
   print(len(scanned_raw))
-  print(scanned_raw[0].keys())
+  print(scanned_raw[0])
 
 if __name__ == "__main__":
   main()
