@@ -29,7 +29,8 @@ def main():
   dynamodb = boto3.resource('dynamodb')
   table = dynamodb.Table('yt_main')
   scan_param = dict(
-    ReturnConsumedCapacity="TOTAL"    
+    ReturnConsumedCapacity="TOTAL",
+    Limit=1
   )
   scanned_raw = []
   
@@ -37,7 +38,7 @@ def main():
     scanned_raw_dict = table.scan(**scan_param)
     # print(scanned_raw_dict)
     print()
-    if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == "200":
+    if scanned_raw_dict["ResponseMetadata"]["HTTPStatusCode"] == 200:
       scanned_raw += scanned_raw_dict
       if (scanned_raw_dict.get("LastEvaluatedKey", False)):
         print(f"data succcessfully scanned. count: {scanned_raw_dict["Count"]}, paginating...")
@@ -46,12 +47,14 @@ def main():
         break
     else:
       print("ERROR at scan")
+      scanned_raw_dict.pop["Items"]
       print(scanned_raw_dict)
       raise ValueError("ERROR at scan")
     scan_param["ExclusiveStartKey"] = scanned_raw_dict["LastEvaluatedKey"]
     sleep(1) # wait 1 sec
   
-  # print(scanned_raw)
+  print(len(scanned_raw))
+  print(scanned_raw[0].keys())
 
 if __name__ == "__main__":
   main()
