@@ -22,3 +22,7 @@ def main():
   plt.plot(agg_list["date"], agg_list["view_25_views"])
   plt.plot(agg_list["date"], agg_list["date_25_views"])
   plt.savefig("./test.png")
+
+
+if __name__ == "__main__":
+  main()
