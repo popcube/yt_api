@@ -21,7 +21,7 @@ def main():
   ]
   agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
   agg_diff_df = pd.concat([
-    agg_df["fetch_time"],
+    agg_df["date"],
     agg_df["view_25_views"].diff(),
     agg_df["date_25_views"].diff(),
   ], axis="columns").dropna(how="any")
