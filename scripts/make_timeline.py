@@ -132,15 +132,14 @@ def make_timeline(
     if not (len(xaxis_minor_byhour) == 1 and xaxis_minor_byhour[0] == 0):
         plt.gca().xaxis.set_minor_formatter(mdates.DateFormatter('%H'))
 
-    if y_range != 0:
-        print(y_range) #DELETEME
-        plt.gca().yaxis.set_major_locator(
-            ticker.MultipleLocator(max(5*(y_range//60), 1)))
-        plt.gca().yaxis.set_minor_locator(
-            ticker.MultipleLocator(max(y_range//60, 1) * 1))
-    plt.gca().yaxis.set_major_formatter(
-        ticker.ScalarFormatter(useOffset=False, useMathText=False))
-    plt.gca().yaxis.get_major_formatter().set_scientific(False)
+    # if y_range != 0:
+    #     plt.gca().yaxis.set_major_locator(
+    #         ticker.MultipleLocator(max(5*(y_range//60), 1)))
+    #     plt.gca().yaxis.set_minor_locator(
+    #         ticker.MultipleLocator(max(y_range//60, 1) * 1))
+    # plt.gca().yaxis.set_major_formatter(
+    #     ticker.ScalarFormatter(useOffset=False, useMathText=False))
+    # plt.gca().yaxis.get_major_formatter().set_scientific(False)
 
     plt.gca().tick_params(axis='x', which='major', length=14, color="white")
     x_fill_pairs = make_fill_pairs(x)
