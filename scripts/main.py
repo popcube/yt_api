@@ -81,9 +81,9 @@ def each_calc():
   print(test_id_df)
   test_id_df.to_csv("./test_output.csv")
   
-  make_timeline(test_id_df.index, test_id_df["views"])
-  make_timeline(test_id_df.index, test_id_df["likes"])
-  make_timeline(test_id_df.index, test_id_df["comments"])
+  make_timeline(test_id_df.index, test_id_df["views"], "test_output_views")
+  make_timeline(test_id_df.index, test_id_df["likes"], "test_output_likes")
+  make_timeline(test_id_df.index, test_id_df["comments"], "test_output_comments")
   
 
 if __name__ == "__main__":
