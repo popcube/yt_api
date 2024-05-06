@@ -79,6 +79,7 @@ def each_calc():
                          test_id]
   
   print(test_id_df)
+  test_id_df = test_id_df.map(int)
   test_id_df.to_csv("./test_output.csv")
   
   make_timeline(test_id_df.index, test_id_df["views"], "test_output_views")
