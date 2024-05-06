@@ -61,7 +61,7 @@ def each_calc():
   for i in scanned_data:
     if "title" in i["date_25"]["videos"][0].keys():
       for ii in i["date_25"]["videos"]:
-        id_set.add(ii["title"])
+        id_set.add(ii["id"])
   print(id_set)
   
   test_id = list(id_set)[0]
