@@ -67,19 +67,29 @@ def each_calc():
   test_id = list(id_set)[0]
   test_id_df = pd.DataFrame(columns=["views", "likes", "comments"])
   
-  test_id_title = ""
+  test_id_info = []
   for i in scanned_data:
     data_ids = [ii["id"] for ii in i["date_25"]["videos"]]
     if test_id in data_ids:
       test_id_idx = data_ids.index(test_id)
       test_id_df.loc[i["fetch_time"]] = i["date_25"]["videos"][test_id_idx]
-      if len(test_id_title) == 0 and i["date_25"]["videos"][test_id_idx].get("title"):
-        test_id_title = i["date_25"]["videos"][test_id_idx]["title"]
+      if len(test_id_info) == 0 and i["date_25"]["videos"][test_id_idx].get("title"):
+        test_id_info = [["date_25"]["videos"][test_id_idx]["title"],
+                         ["date_25"]["videos"][test_id_idx]["date"],
+                         test_id]
   
-  print(test_id)
-  print(test_id_title)
   print(test_id_df)
-    
+  test_id_df.to_csv("./test_output.csv")
+  
+  plt.plot(test_id_df.index, test_id_df["views"])
+  plt.savefig("./test_output_views.png")
+  plt.close()
+  plt.plot(test_id_df.index, test_id_df["likes"])
+  plt.savefig("./test_output_likes.png")
+  plt.close()
+  plt.plot(test_id_df.index, test_id_df["comments"])
+  plt.savefig("./test_output_comments.png")
+  plt.close()
   
 
 if __name__ == "__main__":
