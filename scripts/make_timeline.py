@@ -78,13 +78,14 @@ def make_timeline(
         y_mean60 = pd.Series(y).rolling(60).mean()
 
     plt.scatter(x, y, marker='None')
-
+    
+    plt_title = f"公式Youtube{account}"
     if event_hline is not None:
-        plt.title(f"公式ツイッター{account}フォロワー数＆イベント参加人数観測", y=1, pad=45)
+        plt.title(plt_title, y=1, pad=45)
     elif type(annot_dfds) is not bool:
-        plt.title(f"公式ツイッター{account}フォロワー数観測", y=1, pad=45)
+        plt.title(plt_title + "観測", y=1, pad=45)
     else:
-        plt.title(f"公式ツイッター{account}フォロワー数観測", )
+        plt.title(plt_title + "観測", )
 
     x_range = max(x) - min(x)
     y_range = max(y) - min(y)
