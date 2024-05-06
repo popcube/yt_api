@@ -74,8 +74,8 @@ def each_calc():
       test_id_idx = data_ids.index(test_id)
       test_id_df.loc[i["fetch_time"]] = i["date_25"]["videos"][test_id_idx]
       if len(test_id_info) == 0 and i["date_25"]["videos"][test_id_idx].get("title"):
-        test_id_info = [["date_25"]["videos"][test_id_idx]["title"],
-                         ["date_25"]["videos"][test_id_idx]["date"],
+        test_id_info = [i["date_25"]["videos"][test_id_idx]["title"],
+                         i["date_25"]["videos"][test_id_idx]["date"],
                          test_id]
   
   print(test_id_df)
