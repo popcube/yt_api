@@ -81,15 +81,9 @@ def each_calc():
   print(test_id_df)
   test_id_df.to_csv("./test_output.csv")
   
-  plt.plot(test_id_df.index, test_id_df["views"])
-  plt.savefig("./test_output_views.png")
-  plt.close()
-  plt.plot(test_id_df.index, test_id_df["likes"])
-  plt.savefig("./test_output_likes.png")
-  plt.close()
-  plt.plot(test_id_df.index, test_id_df["comments"])
-  plt.savefig("./test_output_comments.png")
-  plt.close()
+  make_timeline(test_id_df.index, test_id_df["views"])
+  make_timeline(test_id_df.index, test_id_df["likes"])
+  make_timeline(test_id_df.index, test_id_df["comments"])
   
 
 if __name__ == "__main__":
