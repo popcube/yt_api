@@ -1,7 +1,7 @@
 name: main
 on: 
   workflow_dispatch:
-  # push:
+  push:
 
 jobs:
   main:

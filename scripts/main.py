@@ -57,7 +57,7 @@ def agg_calc(local=False):
 
 def each_calc():
   scanned_data = scan_data()
-  id_set = {}
+  id_set = set()
   for i in scanned_data:
     if "title" in i["date_25"]["videos"][0].keys():
       for ii in i["date_25"]["videos"]:
