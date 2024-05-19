@@ -5,14 +5,12 @@ import sys, os
 from dyn_api import main as scan_data
 from make_timeline import make_timeline
 
-def agg_calc(local=False):
+def agg_calc(scanned_data, local=False):
   if local:
     agg_df = pd.read_csv("./agg_df.csv")
     # agg_diff_df = pd.read_csv("./agg_diff_df.csv", index_col="date", parse_dates=["date"])
   
   else:    
-    scanned_data = scan_data()
-    
     agg_list = [
       [
         i["fetch_time"],
@@ -40,23 +38,25 @@ def agg_calc(local=False):
     agg_df["date_25_views"].diff(),
   ], axis="columns").dropna(how="any")
   
-  agg_df.to_csv("./agg_df.csv")
-  agg_diff_df.to_csv("./agg_diff_df.csv")
+  # agg_df.to_csv("./agg_df.csv")
+  # agg_diff_df.to_csv("./agg_diff_df.csv")
   
   make_timeline(agg_df.index, agg_df["view_25_views"], figname="view_25_views")
   make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views_diff")
-  for hour in set(agg_df.loc["2024-05-04"].index.hour):
+  
+  yesterday_ts = pd.Timestamp.now() + pd.Timedelta(days=-1)
+  yesterday_str = yesterday_ts.strftime("%Y-%m-%d")
+  for hour in set(agg_df.loc[yesterday_str].index.hour):
     make_timeline(
-      agg_df.loc[f"2024-05-04 {hour:02}"].index[1:],
-      agg_df.loc[f"2024-05-04 {hour:02}"]["date_25_views"][1:],
-      figname=f"date_25_views_{hour}")
+      agg_df.loc[f"{yesterday_str} {hour:02}"].index[1:],
+      agg_df.loc[f"{yesterday_str} {hour:02}"]["date_25_views"][1:],
+      figname=f"date_25_views_{yesterday_str}_{hour}")
     make_timeline(
-      agg_diff_df.loc[f"2024-05-04 {hour:02}"].index[1:],
-      agg_diff_df.loc[f"2024-05-04 {hour:02}"]["date_25_views"][1:],
-      figname=f"date_25_views_diff_{hour}")
+      agg_diff_df.loc[f"{yesterday_str} {hour:02}"].index[1:],
+      agg_diff_df.loc[f"{yesterday_str} {hour:02}"]["date_25_views"][1:],
+      figname=f"date_25_views_diff_{yesterday_str}_{hour}")
 
-def each_calc():
-  scanned_data = scan_data()
+def each_calc(scanned_data):
   id_set = set()
   for i in scanned_data:
     if "title" in i["date_25"]["videos"][0].keys():
@@ -88,8 +88,9 @@ def each_calc():
   
 
 if __name__ == "__main__":
+  scanned_data = scan_data()
   if os.environ.get("AWS_ACCESS_KEY_ID"):
-    each_calc()
-    # agg_calc()
+    each_calc(scanned_data)
+    agg_calc(scanned_data)
   else:
-    agg_calc(local=True)
+    agg_calc(scanned_data, local=True)
