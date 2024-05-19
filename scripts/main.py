@@ -38,11 +38,13 @@ def agg_calc(scanned_data, local=False):
     agg_df["date_25_views"].diff(),
   ], axis="columns").dropna(how="any")
   
-  # agg_df.to_csv("./agg_df.csv")
-  # agg_diff_df.to_csv("./agg_diff_df.csv")
+  agg_df.to_csv("./agg_df.csv")
+  agg_diff_df.to_csv("./agg_diff_df.csv")
   
   make_timeline(agg_df.index, agg_df["view_25_views"], figname="view_25_views")
   make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views_diff")
+  make_timeline(agg_df.index, agg_df["date_25_views"], figname="date_25_views")
+  make_timeline(agg_diff_df.index, agg_diff_df["date_25_views"], figname="date_25_views_diff")
   
   yesterday_ts = pd.Timestamp.now() + pd.Timedelta(days=-1)
   yesterday_str = yesterday_ts.strftime("%Y-%m-%d")
