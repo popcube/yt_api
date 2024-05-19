@@ -26,7 +26,7 @@ def agg_calc(scanned_data, local=False):
     agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
   
   
-  agg_df["date"] = pd.to_datetime(agg_df["date"]) + pd.Timedelta(hours=9)
+  # agg_df["date"] = pd.to_datetime(agg_df["date"]) + pd.Timedelta(hours=9)
   agg_df.set_index("date", inplace=True)
   
   ## This conversion is to avoid matplotlib.ticker error in GHAction
@@ -74,7 +74,7 @@ def each_calc(scanned_data):
     data_ids = [ii["id"] for ii in i["date_25"]["videos"]]
     if test_id in data_ids:
       test_id_idx = data_ids.index(test_id)
-      test_id_df.loc[pd.to_datetime(i["fetch_time"])] = i["date_25"]["videos"][test_id_idx]
+      test_id_df.loc[i["fetch_time"]] = i["date_25"]["videos"][test_id_idx]
       if len(test_id_info) == 0 and i["date_25"]["videos"][test_id_idx].get("title"):
         test_id_info = [i["date_25"]["videos"][test_id_idx]["title"],
                          i["date_25"]["videos"][test_id_idx]["date"],
@@ -91,6 +91,11 @@ def each_calc(scanned_data):
 
 if __name__ == "__main__":
   scanned_data = scan_data()
+  
+  ## convert fetch_time from UST to JST
+  for idx in range(len(scanned_data)):
+    scanned_data[idx]["fetch_time"] = pd.to_datetime(scanned_data[idx]["fetch_time"]) + pd.Timedelta(hours=9)    
+    
   if os.environ.get("AWS_ACCESS_KEY_ID"):
     each_calc(scanned_data)
     agg_calc(scanned_data)
