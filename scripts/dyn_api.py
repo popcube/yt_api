@@ -5,7 +5,7 @@ import sys
 
 def get_last_hourly_update():
   dynamodb = boto3.resource('dynamodb')
-  table = dynamodb.Table('yt_main')
+  table = dynamodb.Table('yt_main_5min')
   
   last_items_dict = table.query(
     KeyConditionExpression=Key("account").eq("pj_sekai"),

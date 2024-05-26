@@ -6,7 +6,7 @@ from yt_main import main as yt_main
 
 def lambda_handler(event, context):
   dynamodb = boto3.resource('dynamodb')
-  table = dynamodb.Table('yt_main')
+  table = dynamodb.Table('yt_main_5min')
 
   now_str = datetime.now().isoformat(timespec='microseconds')[:-4]
   

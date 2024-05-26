@@ -69,10 +69,10 @@ def parse_yt_date(item):
 
 def videos_50(ids):
   srch_queries = {
-  "key": api_key,
-  "part": "liveStreamingDetails,statistics",
-  # "id": "Vx25rib86pc,SKfNzeuWtNg"
-  "id": ",".join(ids)
+    "key": api_key,
+    "part": "liveStreamingDetails,statistics",
+    # "id": "Vx25rib86pc,SKfNzeuWtNg"
+    "id": ",".join(ids)
   }
   
   res = requests.get(vid_base_url, params=srch_queries)
@@ -112,8 +112,9 @@ def parse_25_data_to_dict(df_25):
   if "date" in df_25.columns:
     ### consolidate date and liveDate fields to date
     ### Timestamp object aware of tzinfo needs to be truncated 6 chars more
+    ### drop found axis as well
     df_25["date"] = df_25[["date", "liveDate"]].max(axis="columns").apply(
-      lambda x: x.isoformat(timespec='microseconds', )[:-10])
+      lambda x: x.isoformat(timespec='microseconds')[:-10])
   df_25.drop(["liveDate", "found"], axis="columns", inplace=True)
   
   ### get total values
@@ -126,6 +127,7 @@ def parse_25_data_to_dict(df_25):
     "views": df_25_views,
     "likes": df_25_likes,
     "comments": df_25_comments,
+    ### orient="index" means dict(index=dict(column=df_value))
     "videos": list(df_25.to_dict(orient="index").values())
   }
 

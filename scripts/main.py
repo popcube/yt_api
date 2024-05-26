@@ -9,6 +9,7 @@ def agg_calc(scanned_data, local=False):
   if local:
     agg_df = pd.read_csv("./agg_df.csv")
     # agg_diff_df = pd.read_csv("./agg_diff_df.csv", index_col="date", parse_dates=["date"])
+    agg_df["date"] = pd.to_datetime(agg_df["date"]) + pd.Timedelta(hours=9)
   
   else:    
     agg_list = [
@@ -90,14 +91,14 @@ def each_calc(scanned_data):
   
 
 if __name__ == "__main__":
-  scanned_data = scan_data()
-  
-  ## convert fetch_time from UST to JST
-  for idx in range(len(scanned_data)):
-    scanned_data[idx]["fetch_time"] = pd.to_datetime(scanned_data[idx]["fetch_time"]) + pd.Timedelta(hours=9)    
-    
   if os.environ.get("AWS_ACCESS_KEY_ID"):
+    scanned_data = scan_data()
+    
+    ## convert fetch_time from UST to JST
+    for idx in range(len(scanned_data)):
+      scanned_data[idx]["fetch_time"] = pd.to_datetime(scanned_data[idx]["fetch_time"]) + pd.Timedelta(hours=9)    
+    
     each_calc(scanned_data)
     agg_calc(scanned_data)
   else:
-    agg_calc(scanned_data, local=True)
+    agg_calc([], local=True)
