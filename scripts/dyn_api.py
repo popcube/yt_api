@@ -3,9 +3,11 @@ from boto3.dynamodb.conditions import Key, Attr
 from time import sleep
 import sys
 
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('yt_main_5min')
+
 def get_last_hourly_update():
-  dynamodb = boto3.resource('dynamodb')
-  table = dynamodb.Table('yt_main_5min')
   
   last_items_dict = table.query(
     KeyConditionExpression=Key("account").eq("pj_sekai"),
@@ -26,8 +28,6 @@ def get_last_hourly_update():
   print(last_items_dict["Items"][0]["date_25"])
   
 def main():
-  dynamodb = boto3.resource('dynamodb')
-  table = dynamodb.Table('yt_main')
   scan_param = dict(
     ReturnConsumedCapacity="TOTAL",
     # Limit=20
