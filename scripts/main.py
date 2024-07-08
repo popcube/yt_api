@@ -6,7 +6,7 @@ from dyn_api import main as scan_data
 from make_timeline import make_timeline
 
 def detect_video_id_change(scanned_data):
-  change_flag_df = pd.DataFrame([[[False]*len(scanned_data)]]*2, columns=["view_25_changed", "date_25_changed"])
+  change_flag_df = pd.DataFrame([[False]*len(scanned_data)]*2, columns=["view_25_changed", "date_25_changed"])
   for i in range(1, len(scanned_data)):
     if set(videos["id"] for videos in scanned_data[i]["view_25"]["videos"]) \
         != set(videos["id"] for videos in scanned_data[i-1]["view_25"]["videos"]):
