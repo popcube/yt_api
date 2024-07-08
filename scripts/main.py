@@ -46,12 +46,14 @@ def agg_calc(scanned_data, local=False):
   agg_df = agg_df.map(int)
 
   change_flag_df = detect_video_id_change(scanned_data)
+  change_flag_df.set_index(agg_df.index, inplace=True)
   print()
   print("##### change flag df #####")
   print(change_flag_df)
   print()
   print("##### True point in change flag df #####")
-  print(change_flag_df[(change_flag_df["view_25_changed"] == True) | (change_flag_df["date_25_changed"] == True)])
+  print(change_flag_df["view_25_changed"][change_flag_df["view_25_changed"] == True])
+  print(change_flag_df["date_25_changed"][change_flag_df["date_25_changed"] == True])
   
   agg_diff_df = pd.concat([
     agg_df["view_25_views"].diff(),
