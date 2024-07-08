@@ -10,10 +10,10 @@ def detect_video_id_change(scanned_data):
   for i in range(1, len(scanned_data)):
     if set(videos["id"] for videos in scanned_data[i]["view_25"]["videos"]) \
         != set(videos["id"] for videos in scanned_data[i-1]["view_25"]["videos"]):
-      change_flag_df["view_25_changed"] = True
+      change_flag_df.loc[i, "view_25_changed"] = True
     if set(videos["id"] for videos in scanned_data[i]["date_25"]["videos"]) \
         != set(videos["id"] for videos in scanned_data[i-1]["date_25"]["videos"]):
-      change_flag_df["date_25_changed"] = True
+      change_flag_df.loc[i, "date_25_changed"] = True
   return change_flag_df
 
 def agg_calc(scanned_data, local=False):
