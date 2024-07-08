@@ -47,19 +47,26 @@ def agg_calc(scanned_data, local=False):
 
   change_flag_df = detect_video_id_change(scanned_data)
   change_flag_df.set_index(agg_df.index, inplace=True)
+  change_flag_view_25 = change_flag_df["view_25_changed"][change_flag_df["view_25_changed"] == True]
+  change_flag_date_25 = change_flag_df["date_25_changed"][change_flag_df["date_25_changed"] == True]
   print()
   print("##### change flag df #####")
   print(change_flag_df)
   print()
   print("##### True point in change flag df #####")
-  print(change_flag_df["view_25_changed"][change_flag_df["view_25_changed"] == True])
-  print(change_flag_df["date_25_changed"][change_flag_df["date_25_changed"] == True])
+  print(change_flag_view_25)
+  print(change_flag_date_25)
+
+  agg_df_view_25_diff = agg_df["view_25_views"].diff()
+  agg_df_date_25_diff = agg_df["date_25_views"].diff()
+
+  agg_df_view_25_diff.loc[change_flag_view_25] = float('nan')
+  agg_df_date_25_diff.loc[change_flag_date_25] = float('nan')
   
   agg_diff_df = pd.concat([
-    agg_df["view_25_views"].diff(),
-    agg_df["date_25_views"].diff(),
-    change_flag_df
-  ], axis="columns").dropna(how="any")
+    agg_df_view_25_diff,
+    agg_df_date_25_diff
+  ], axis="columns")
   
   agg_df.to_csv("./agg_df.csv")
   agg_diff_df.to_csv("./agg_diff_df.csv")
