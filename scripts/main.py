@@ -5,6 +5,17 @@ import sys, os
 from dyn_api import main as scan_data
 from make_timeline import make_timeline
 
+def detect_video_id_change(scanned_data):
+  change_flag_df = pd.DataFrame([[[False]*len(scanned_data)]]*2, columns=["view_25_changed", "date_25_changed"])
+  for i in range(1, len(scanned_data)):
+    if set(videos["id"] for videos in scanned_data[i]["view_25"]["videos"]) \
+        != set(videos["id"] for videos in scanned_data[i-1]["view_25"]["videos"]):
+      change_flag_df["view_25_changed"] = True
+    if set(videos["id"] for videos in scanned_data[i]["date_25"]["videos"]) \
+        != set(videos["id"] for videos in scanned_data[i-1]["date_25"]["videos"]):
+      change_flag_df["date_25_changed"] = True
+  return change_flag_df
+
 def agg_calc(scanned_data, local=False):
   if local:
     agg_df = pd.read_csv("./agg_df.csv")
@@ -33,10 +44,19 @@ def agg_calc(scanned_data, local=False):
   ## This conversion is to avoid matplotlib.ticker error in GHAction
   ## Note that DynamoDB responds in Decimal.decimal type
   agg_df = agg_df.map(int)
+
+  change_flag_df = detect_video_id_change(scanned_data)
+  print()
+  print("##### change flag df #####")
+  print(change_flag_df)
+  print()
+  print("##### True point in change flag df #####")
+  print(change_flag_df[(change_flag_df["view_25_changed"] == True) | (change_flag_df["date_25_changed"] == True)])
   
   agg_diff_df = pd.concat([
     agg_df["view_25_views"].diff(),
     agg_df["date_25_views"].diff(),
+    change_flag_df
   ], axis="columns").dropna(how="any")
   
   agg_df.to_csv("./agg_df.csv")

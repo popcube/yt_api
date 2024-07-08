@@ -169,7 +169,7 @@ def make_timeline(
     # 差分表示のときはnan部を点で表現
     if 'dif' in figname:
         if len(y_label) == 0:
-            plt.gca().set_ylabel("フォロワー数増減量推移")
+            plt.gca().set_ylabel("増減量推移")
         plt.axhline(y=0, linestyle="dotted")
         if len(nan_idxs) > 0:
             plt.plot(
@@ -186,7 +186,7 @@ def make_timeline(
     # 実数表示の時はnan部を2点間の線で表現
     else:
         if len(y_label) == 0:
-            plt.gca().set_ylabel("フォロワー数推移")
+            plt.gca().set_ylabel("推移")
         for i, ni in enumerate(nan_idxs):
             if i == 0:
                 plt.plot([x[ni-1], x[ni]], [y[ni-1], y[ni]],
@@ -337,7 +337,7 @@ def make_multi_timeline(
 ):
 
     plt.figure(figsize=(15, 8))
-    plt.title(f"公式ツイッター{account}フォロワー数観測")
+    plt.title(f"{account} 増減量推移")
 
     for df in dfs:
         plt.scatter(df.index, df.iloc[:, 0], marker='None')
@@ -407,7 +407,7 @@ def make_multi_timeline(
     if y_label:
         plt.gca().set_ylabel(y_label)
     else:
-        plt.gca().set_ylabel("フォロワー数増減量推移")
+        plt.gca().set_ylabel("増減量推移")
 
     # この処理時点でのy軸描画範囲 {最小値、最大値}
     ylim = plt.gca().get_ylim()
