@@ -55,7 +55,7 @@ def agg_calc(scanned_data, local=False):
   print()
   print("##### True point in change flag df #####")
   print(change_flag_view_25[change_flag_df["view_25_changed"] == True])
-  print(change_flag_date_25[change_flag_df["date_25_changed"] == True])
+  print(change_flag_date_25[change_flag_df["date_25_changed"] == True], flush=True)
 
   agg_df_view_25_diff = agg_df["view_25_views"].diff()
   agg_df_date_25_diff = agg_df["date_25_views"].diff()
@@ -91,46 +91,48 @@ def agg_calc(scanned_data, local=False):
       agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"],
       figname=f"date_25_views_diff_{yesterday_str}_{hour}")
 
-def each_calc(scanned_data):
-  id_set = set()
+def make_video_master_df(scanned_data, category_key="date_25"):
+  master_dict = dict()
   for i in scanned_data:
-    if "title" in i["date_25"]["videos"][0].keys():
-      for ii in i["date_25"]["videos"]:
-        id_set.add(ii["id"])
-  print(id_set)
+    ## for every element in scanned_data, title can be included for all or excluded for all
+    ## one sample of vid suffices to say that the element has title for all vids or not
+    if "title" in i[category_key]["videos"][0].keys():
+      for ii in i[category_key]["videos"]:
+        master_dict[ii["id"]] = {
+          "title": ii["title"],
+          "date": ii["date"],
+          # "data": pd.DataFrame(columns=["views", "likes", "comments"])
+        }
+  # print(id_set, flush=True)
+  print()
+  print("##### number of videos found #####")
+  print(len(master_dict), flush=True)
   
-  test_id = list(id_set)[0]
-  test_id_df = pd.DataFrame(columns=["views", "likes", "comments"])
+  master_views_df = pd.DataFrame(columns=master_dict.keys())
+  master_likes_df = pd.DataFrame(columns=master_dict.keys())
+  master_comments_df = pd.DataFrame(columns=master_dict.keys())
+    
+  for data in scanned_data:
+    for video_data_point in data[category_key]["videos"]:
+      master_views_df.loc[data["fetch_time"], video_data_point["id"]] = video_data_point["views"]
+      master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = video_data_point["likes"]
+      master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = video_data_point["comments"]
   
-  test_id_info = []
-  for i in scanned_data:
-    data_ids = [ii["id"] for ii in i["date_25"]["videos"]]
-    if test_id in data_ids:
-      test_id_idx = data_ids.index(test_id)
-      test_id_df.loc[i["fetch_time"]] = i["date_25"]["videos"][test_id_idx]
-      if len(test_id_info) == 0 and i["date_25"]["videos"][test_id_idx].get("title"):
-        test_id_info = [i["date_25"]["videos"][test_id_idx]["title"],
-                         i["date_25"]["videos"][test_id_idx]["date"],
-                         test_id]
-  
-  print(test_id_df)
-  test_id_df = test_id_df.map(int)
-  test_id_df.to_csv("./test_output.csv")
-  
-  make_timeline(test_id_df.index, test_id_df["views"], "test_output_views")
-  make_timeline(test_id_df.index, test_id_df["likes"], "test_output_likes")
-  make_timeline(test_id_df.index, test_id_df["comments"], "test_output_comments")
-  
-
+  for df_suffix, df in zip([" views", " likes", " comments"], [master_views_df, master_likes_df, master_comments_df]):
+    for id in df.columns:
+      make_timeline(df.index, df[id], figname=master_dict[id]["title"] + " " + category_key + df_suffix)
+      
 if __name__ == "__main__":
   if os.environ.get("AWS_ACCESS_KEY_ID"):
     scanned_data = scan_data()
     
-    ## convert fetch_time from UST to JST
+    ## convert fetch_time from string to pd.Timestamp
+    ## and from UST to JST
     for idx in range(len(scanned_data)):
       scanned_data[idx]["fetch_time"] = pd.to_datetime(scanned_data[idx]["fetch_time"]) + pd.Timedelta(hours=9)    
     
-    each_calc(scanned_data)
+    make_video_master_df(scanned_data, "date_25")
+    make_video_master_df(scanned_data, "view_25")
     agg_calc(scanned_data)
   else:
     agg_calc([], local=True)
