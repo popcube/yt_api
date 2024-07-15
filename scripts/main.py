@@ -79,17 +79,17 @@ def agg_calc(scanned_data):
   make_timeline(agg_df.index, agg_df["date_25_views"], figname="date_25_views")
   make_timeline(agg_diff_date_25_views_df.index, agg_diff_date_25_views_df, figname="date_25_views_diff")
   
-  yesterday_ts = pd.Timestamp.now() + pd.Timedelta(days=-1)
-  yesterday_str = yesterday_ts.strftime("%Y-%m-%d")
-  for hour in set(agg_df.loc[yesterday_str].index.hour):
-    make_timeline(
-      agg_df.loc[f"{yesterday_str} {hour:02}"].index,
-      agg_df.loc[f"{yesterday_str} {hour:02}"]["date_25_views"],
-      figname=f"date_25_views_{yesterday_str}_{hour}")
-    make_timeline(
-      agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"].index,
-      agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"],
-      figname=f"date_25_views_diff_{yesterday_str}_{hour}")
+  # yesterday_ts = pd.Timestamp.now() + pd.Timedelta(days=-1)
+  # yesterday_str = yesterday_ts.strftime("%Y-%m-%d")
+  # for hour in set(agg_df.loc[yesterday_str].index.hour):
+  #   make_timeline(
+  #     agg_df.loc[f"{yesterday_str} {hour:02}"].index,
+  #     agg_df.loc[f"{yesterday_str} {hour:02}"]["date_25_views"],
+  #     figname=f"date_25_views_{yesterday_str}_{hour}")
+  #   make_timeline(
+  #     agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"].index,
+  #     agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"],
+  #     figname=f"date_25_views_diff_{yesterday_str}_{hour}")
     
 def show_progress(idx, target_len):
   milestone_list = range(0, target_len, int(target_len / 10))
@@ -113,8 +113,8 @@ def each_calc(scanned_data, category_key="date_25"):
         }
   # print(id_set, flush=True)
   print()
-  print("##### number of videos found #####")
-  print(len(master_dict), flush=True)
+  print(f"##### category: {category_key} #####")
+  print(f"number of videos found: {len(master_dict)}", flush=True)
   
   master_views_df = pd.DataFrame(columns=master_dict.keys())
   master_likes_df = pd.DataFrame(columns=master_dict.keys())
@@ -130,11 +130,14 @@ def each_calc(scanned_data, category_key="date_25"):
   for df_suffix, df in zip(["_views", "_likes", "_comments"], [master_views_df, master_likes_df, master_comments_df]):
     for id in df.columns:
       fig_title = master_dict[id]["title"] + "_" + category_key + df_suffix
-      fig_name = id + "_" + category_key + df_suffix
+      fig_name = category_key + df_suffix + "_" + id
       video_sr = df[id].dropna()
-      video_sr.to_csv(fig_name + ".csv")
-      print("next vid is " + id)
-      make_timeline(video_sr.index, video_sr, figname=fig_name, plt_title=fig_title)
+      try:
+        make_timeline(video_sr.index, video_sr, figname=fig_name, plt_title=fig_title)
+      except Exception as e:
+        print(e)
+        print(f"ERROR at make_timeline for {id}, {category_key}")
+        video_sr.to_csv(fig_name + ".csv")
       
 if __name__ == "__main__":
   if os.environ.get("AWS_ACCESS_KEY_ID"):

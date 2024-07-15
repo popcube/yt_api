@@ -84,9 +84,9 @@ def make_timeline(
     if event_hline is not None:
         plt.title(plt_title, y=1, pad=45)
     elif type(annot_dfds) is not bool:
-        plt.title(plt_title + "観測", y=1, pad=45)
+        plt.title(plt_title, y=1, pad=45)
     else:
-        plt.title(plt_title + "観測", )
+        plt.title(plt_title, )
 
     x_range = max(x) - min(x)
     y_range = max(y) - min(y)
