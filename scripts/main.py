@@ -131,7 +131,10 @@ def each_calc(scanned_data, category_key="date_25"):
     for id in df.columns:
       fig_title = master_dict[id]["title"] + "_" + category_key + df_suffix
       fig_name = id + "_" + category_key + df_suffix
-      make_timeline(df.index, df[id], figname=fig_name, plt_title=fig_title)
+      video_sr = df[id].dropna()
+      video_sr.to_csv(fig_name + ".csv")
+      print("next vid is " + id)
+      make_timeline(video_sr.index, video_sr, figname=fig_name, plt_title=fig_title)
       
 if __name__ == "__main__":
   if os.environ.get("AWS_ACCESS_KEY_ID"):
