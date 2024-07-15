@@ -67,7 +67,8 @@ def make_timeline(
     event_hline=None,
     ylim=None,
     xlim=None,
-    data_annots=()
+    data_annots=(),
+    plt_title="公式Youtube{account}"
 ):
 
     plt.figure(figsize=(15, 8))
@@ -79,7 +80,7 @@ def make_timeline(
 
     plt.scatter(x, y, marker='None')
     
-    plt_title = f"公式Youtube{account}"
+    # plt_title = f"公式Youtube{account}"
     if event_hline is not None:
         plt.title(plt_title, y=1, pad=45)
     elif type(annot_dfds) is not bool:

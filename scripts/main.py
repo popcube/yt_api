@@ -127,9 +127,11 @@ def each_calc(scanned_data, category_key="date_25"):
       master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["likes"])
       master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["comments"])
   
-  for df_suffix, df in zip([" views", " likes", " comments"], [master_views_df, master_likes_df, master_comments_df]):
+  for df_suffix, df in zip(["_views", "_likes", "_comments"], [master_views_df, master_likes_df, master_comments_df]):
     for id in df.columns:
-      make_timeline(df.index, df[id], figname=master_dict[id]["title"] + " " + category_key + df_suffix)
+      fig_title = master_dict[id]["title"] + "_" + category_key + df_suffix
+      fig_name = id + "_" + category_key + df_suffix
+      make_timeline(df.index, df[id], figname=fig_name, title=fig_title)
       
 if __name__ == "__main__":
   if os.environ.get("AWS_ACCESS_KEY_ID"):
