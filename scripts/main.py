@@ -71,21 +71,24 @@ def agg_calc(scanned_data, local=False):
   agg_df.to_csv("./agg_df.csv")
   agg_diff_df.to_csv("./agg_diff_df.csv")
   
+  agg_diff_view_25_views_df = agg_diff_df["view_25_views"].dropna()
+  agg_diff_date_25_views_df = agg_diff_df["date_25_views"].dropna()
+  
   make_timeline(agg_df.index, agg_df["view_25_views"], figname="view_25_views")
-  make_timeline(agg_diff_df.index, agg_diff_df["view_25_views"], figname="view_25_views_diff")
+  make_timeline(agg_diff_view_25_views_df.index, agg_diff_view_25_views_df, figname="view_25_views_diff")
   make_timeline(agg_df.index, agg_df["date_25_views"], figname="date_25_views")
-  make_timeline(agg_diff_df.index, agg_diff_df["date_25_views"], figname="date_25_views_diff")
+  make_timeline(agg_diff_date_25_views_df.index, agg_diff_date_25_views_df, figname="date_25_views_diff")
   
   yesterday_ts = pd.Timestamp.now() + pd.Timedelta(days=-1)
   yesterday_str = yesterday_ts.strftime("%Y-%m-%d")
   for hour in set(agg_df.loc[yesterday_str].index.hour):
     make_timeline(
-      agg_df.loc[f"{yesterday_str} {hour:02}"].index[1:],
-      agg_df.loc[f"{yesterday_str} {hour:02}"]["date_25_views"][1:],
+      agg_df.loc[f"{yesterday_str} {hour:02}"].index,
+      agg_df.loc[f"{yesterday_str} {hour:02}"]["date_25_views"],
       figname=f"date_25_views_{yesterday_str}_{hour}")
     make_timeline(
-      agg_diff_df.loc[f"{yesterday_str} {hour:02}"].index[1:],
-      agg_diff_df.loc[f"{yesterday_str} {hour:02}"]["date_25_views"][1:],
+      agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"].index,
+      agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"],
       figname=f"date_25_views_diff_{yesterday_str}_{hour}")
 
 def each_calc(scanned_data):
