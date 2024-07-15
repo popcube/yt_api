@@ -92,12 +92,12 @@ def agg_calc(scanned_data):
       figname=f"date_25_views_diff_{yesterday_str}_{hour}")
     
 def show_progress(idx, target_len):
+  milestone_list = range(0, target_len, int(target_len / 10))
   if idx == 0:
     print()
     print("##### Processing start #####")
-  milestone_list = range(0, target_len, int(target_len / 10))
-  if idx in milestone_list:
-    print(f"{milestone_list.index(idx) * 10}%...", flush=True)  
+  elif idx in milestone_list:
+    print(f"{milestone_list.index(idx) * 10}% ...", flush=True)  
 
 def each_calc(scanned_data, category_key="date_25"):
   master_dict = dict()
@@ -131,7 +131,7 @@ def each_calc(scanned_data, category_key="date_25"):
     for id in df.columns:
       fig_title = master_dict[id]["title"] + "_" + category_key + df_suffix
       fig_name = id + "_" + category_key + df_suffix
-      make_timeline(df.index, df[id], figname=fig_name, title=fig_title)
+      make_timeline(df.index, df[id], figname=fig_name, plt_title=fig_title)
       
 if __name__ == "__main__":
   if os.environ.get("AWS_ACCESS_KEY_ID"):
