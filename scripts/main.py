@@ -16,26 +16,26 @@ def detect_video_id_change(scanned_data):
       change_flag_df.loc[i, "date_25_changed"] = True
   return change_flag_df
 
-def agg_calc(scanned_data, local=False):
-  if local:
-    agg_df = pd.read_csv("./agg_df.csv")
-    # agg_diff_df = pd.read_csv("./agg_diff_df.csv", index_col="date", parse_dates=["date"])
-    agg_df["date"] = pd.to_datetime(agg_df["date"]) + pd.Timedelta(hours=9)
+def agg_calc(scanned_data):
+  # if local:
+  #   agg_df = pd.read_csv("./agg_df.csv")
+  #   # agg_diff_df = pd.read_csv("./agg_diff_df.csv", index_col="date", parse_dates=["date"])
+  #   agg_df["date"] = pd.to_datetime(agg_df["date"]) + pd.Timedelta(hours=9)
   
-  else:    
-    agg_list = [
-      [
-        i["fetch_time"],
-        i["view_25"]["views"],
-        i["view_25"]["likes"],
-        i["view_25"]["comments"],
-        i["date_25"]["views"],
-        i["date_25"]["likes"],
-        i["date_25"]["comments"],
-      ]
-      for i in scanned_data
+  # else:    
+  agg_list = [
+    [
+      i["fetch_time"],
+      i["view_25"]["views"],
+      i["view_25"]["likes"],
+      i["view_25"]["comments"],
+      i["date_25"]["views"],
+      i["date_25"]["likes"],
+      i["date_25"]["comments"],
     ]
-    agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
+    for i in scanned_data
+  ]
+  agg_df = pd.DataFrame(agg_list, columns=["date", "view_25_views", "view_25_likes", "view_25_comments", "date_25_views", "date_25_likes", "date_25_comments"])
   
   
   # agg_df["date"] = pd.to_datetime(agg_df["date"]) + pd.Timedelta(hours=9)
@@ -121,7 +121,7 @@ def each_calc(scanned_data, category_key="date_25"):
   master_comments_df = pd.DataFrame(columns=master_dict.keys())
     
   for scanned_data_idx, data in enumerate(scanned_data):
-    show_progress(scanned_data_idx, data, len(scanned_data))
+    show_progress(scanned_data_idx, len(scanned_data))
     for video_data_point in data[category_key]["videos"]:
       master_views_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["views"])
       master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["likes"])
@@ -143,5 +143,5 @@ if __name__ == "__main__":
     each_calc(scanned_data, "date_25")
     each_calc(scanned_data, "view_25")
     agg_calc(scanned_data)
-  else:
-    agg_calc([], local=True)
+  # else:
+  #   agg_calc([], local=True)
