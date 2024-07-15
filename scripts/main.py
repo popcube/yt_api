@@ -90,8 +90,16 @@ def agg_calc(scanned_data, local=False):
       agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"].index,
       agg_diff_date_25_views_df.loc[f"{yesterday_str} {hour:02}"],
       figname=f"date_25_views_diff_{yesterday_str}_{hour}")
+    
+def show_progress(idx, target_len):
+  if idx == 0:
+    print()
+    print("##### Processing start #####")
+  milestone_list = range(0, target_len, int(target_len / 10))
+  if idx in milestone_list:
+    print(f"{milestone_list.index(idx) * 10}%...", flush=True)  
 
-def make_video_master_df(scanned_data, category_key="date_25"):
+def each_calc(scanned_data, category_key="date_25"):
   master_dict = dict()
   for i in scanned_data:
     ## for every element in scanned_data, title can be included for all or excluded for all
@@ -112,11 +120,12 @@ def make_video_master_df(scanned_data, category_key="date_25"):
   master_likes_df = pd.DataFrame(columns=master_dict.keys())
   master_comments_df = pd.DataFrame(columns=master_dict.keys())
     
-  for data in scanned_data:
+  for scanned_data_idx, data in enumerate(scanned_data):
+    show_progress(scanned_data_idx, data, len(scanned_data))
     for video_data_point in data[category_key]["videos"]:
-      master_views_df.loc[data["fetch_time"], video_data_point["id"]] = video_data_point["views"]
-      master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = video_data_point["likes"]
-      master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = video_data_point["comments"]
+      master_views_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["views"])
+      master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["likes"])
+      master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["comments"])
   
   for df_suffix, df in zip([" views", " likes", " comments"], [master_views_df, master_likes_df, master_comments_df]):
     for id in df.columns:
@@ -131,8 +140,8 @@ if __name__ == "__main__":
     for idx in range(len(scanned_data)):
       scanned_data[idx]["fetch_time"] = pd.to_datetime(scanned_data[idx]["fetch_time"]) + pd.Timedelta(hours=9)    
     
-    make_video_master_df(scanned_data, "date_25")
-    make_video_master_df(scanned_data, "view_25")
+    each_calc(scanned_data, "date_25")
+    each_calc(scanned_data, "view_25")
     agg_calc(scanned_data)
   else:
     agg_calc([], local=True)

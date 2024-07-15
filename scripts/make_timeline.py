@@ -325,7 +325,7 @@ def make_timeline(
             return
 
     plt.savefig(f'./{figname}.png')
-    print(f'./{figname}.png is saved!')
+    print(f'./{figname}.png is saved!', flush=True)
     plt.close()
 
 
@@ -448,5 +448,5 @@ def make_multi_timeline(
             return
 
     plt.savefig(f'./{figname}.png')
-    print(f'./{figname}.png is saved!')
+    print(f'./{figname}.png is saved!', flush=True)
     plt.close()
