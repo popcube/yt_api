@@ -20,7 +20,7 @@ def query_25(srch_queries):
     print(res.content)
     sys.exit(1)
     
-  res_dict = json.loads(res.text)    
+  res_dict = json.loads(res.text)
   res_items = [
     [
       res_item["id"]["videoId"],
@@ -39,7 +39,7 @@ def date_25():
     "key": api_key,
     "channelId": ch_id,
     "part": "snippet",
-    # "type": "video",
+    "type": "video",
     "order": "date",
     # "order": "viewCount",
     "maxResults": 25
@@ -51,7 +51,7 @@ def view_25():
     "key": api_key,
     "channelId": ch_id,
     "part": "snippet",
-    # "type": "video",
+    "type": "video",
     # "order": "date",
     "order": "viewCount",
     "maxResults": 25
@@ -136,7 +136,7 @@ def main(view_ids=[], date_ids=[]):
   # view_25_data = pd.DataFrame()
   # id_50 = pd.Series()
   
-  if len(view_ids):
+  if len(view_ids) > 0:
     date_25_data = pd.DataFrame(date_ids, columns=["id"])
   else:
     date_25_data = date_25()
