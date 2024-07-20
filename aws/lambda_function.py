@@ -29,6 +29,9 @@ def lambda_handler(event, context):
     # print(last_item_dict)
     view_ids = [last_item["id"] for last_item in last_item_dict["view_25"]["videos"]]
     date_ids = [last_item["id"] for last_item in last_item_dict["date_25"]["videos"]]
+    
+  else:
+    print("This is the hourly update!")
 
   yt_dict = yt_main(view_ids=view_ids, date_ids=date_ids)
   table.put_item(
