@@ -102,7 +102,9 @@ def show_progress(idx, target_len):
     print(f"{milestone_list.index(idx) * 10}% ...", flush=True)  
 
 ## note that data of master_dict can change in the caller's side when changed in the called function
-def each_calc(scanned_data, master_dict, category_key="date_25"):
+def each_calc(scanned_data, category_key="date_25"):
+  master_dict = dict()
+  
   for i in scanned_data:
     ## for every element in scanned_data, title can be included for all or excluded for all
     ## one sample of vid suffices to say that the element has title for all vids or not
@@ -129,22 +131,32 @@ def each_calc(scanned_data, master_dict, category_key="date_25"):
       master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["likes"])
       master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["comments"])
       
-  return master_views_df, master_likes_df, master_comments_df
+  return master_views_df, master_likes_df, master_comments_df, master_dict
 
 ###### scheme of input df ######
 ## columns = list of video ids
 ## index = timestamp
-def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, df_view_views, df_view_likes, df_view_comments):
+def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, df_view_views, df_view_likes, df_view_comments, date_master_dict, view_master_dict):
   
   ## merge the video date when duplicated in date and view dfs
+  # for df_date, df_view in zip([df_date_views, df_date_likes, df_date_comments], [df_view_views, df_view_likes, df_view_comments]):
+  #   dupe_cols = []
+  #   for date_column in df_date.columns:
+  #     if date_column in df_view.columns:
+  #       dupe_cols.append(date_column)
+  #       # merge the Series with the first values for the dupe index
+  #       df_view[date_column] = pd.concat([df_date[date_column], df_view[date_column]]).groupby(level=0).first()
+  #   df_date.drop(columns=dupe_cols, inplace=True)
+
+  ## merge the video data when duplicated in date and view master_dicts
+  ## delete the dupe data from date master_dict and dfs
+  dupe_cols = list(set(date_master_dict.keys()) & set(view_master_dict.keys()))
   for df_date, df_view in zip([df_date_views, df_date_likes, df_date_comments], [df_view_views, df_view_likes, df_view_comments]):
-    df_date_redundant_columns = []
-    for date_column in df_date.columns:
-      if date_column in df_view.columns:
-        df_date_redundant_columns.append(date_column)
-        # merge the Series with the first values for the dupe index
-        df_view[date_column] = pd.concat([df_date[date_column], df_view[date_column]]).groupby(level=0).first()
-    df_date.drop(columns=df_date_redundant_columns, inplace=True)
+    df_view[dupe_cols] = pd.concat([df_date[dupe_cols], df_view[dupe_cols]]).groupby(level=0).first()
+    df_date.drop(columns=dupe_cols, inplace=True)
+    
+  ## from here onwards, there's only one master_dict
+  master_dict = date_master_dict | view_master_dict
   
   df_date_25_info = pd.DataFrame(df_date_views.columns, columns=["id"])
   df_date_25_info["date"] = df_date_25_info["id"].apply(lambda id: master_dict[id]["date"])
@@ -158,8 +170,8 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_view_25_info["title"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["title"])
   df_view_25_info["date"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["date"])
   
-  df_date_25_info.to_csv("summary_list.csv", encoding='utf-8')
-  df_view_25_info.to_csv("summary_list.csv", encoding='utf-8', mode='a')
+  df_date_25_info.to_csv("summary_list.csv", index=False, encoding='utf-8')
+  df_view_25_info.to_csv("summary_list.csv", index=False, encoding='utf-8', mode='a')
         
   for category_key, master_views_df, master_likes_df, master_comments_df in [
     ["[date_25]", df_date_views, df_date_likes, df_date_comments],
@@ -186,9 +198,8 @@ if __name__ == "__main__":
     for idx in range(len(scanned_data)):
       scanned_data[idx]["fetch_time"] = pd.to_datetime(scanned_data[idx]["fetch_time"]) + pd.Timedelta(hours=9)    
     
-    master_dict = dict()
-    df_date_views, df_date_likes, df_date_comments = each_calc(scanned_data, master_dict, "date_25")
-    df_view_views, df_view_likes, df_view_comments = each_calc(scanned_data, master_dict, "view_25")
-    merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, df_view_views, df_view_likes, df_view_comments)
+    df_date_views, df_date_likes, df_date_comments, date_master_dict = each_calc(scanned_data, category_key="date_25")
+    df_view_views, df_view_likes, df_view_comments, view_master_dict = each_calc(scanned_data, category_key="view_25")
+    merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, df_view_views, df_view_likes, df_view_comments, date_master_dict, view_master_dict)
   # else:
   #   agg_calc([], local=True)
