@@ -71,7 +71,7 @@ def agg_calc(scanned_data):
   agg_diff_df = pd.concat([
     agg_df_view_25_diff,
     agg_df_date_25_diff
-  ], axis="columns")
+  ], axis="columns").rename(columns={0: "view_25_views", 1: "date_25_views"})
   
   agg_df.to_csv("./agg_df.csv")
   agg_diff_df.to_csv("./agg_diff_df.csv")
