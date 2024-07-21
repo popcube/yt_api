@@ -6,6 +6,9 @@ import csv
 from dyn_api import main as scan_data
 from make_timeline import make_timeline
 
+## JST on UTC system
+now = pd.Timestamp.now() + pd.Timedelta(hours=9)
+
 def detect_video_id_change(scanned_data):
   change_flag_df = pd.DataFrame([[False]*2]*len(scanned_data), columns=["view_25_changed", "date_25_changed"])
   for i in range(1, len(scanned_data)):
@@ -112,7 +115,7 @@ def each_calc(scanned_data, category_key="date_25"):
       for ii in i[category_key]["videos"]:
         master_dict[ii["id"]] = {
           "title": ii["title"],
-          "date": pd.Timestamp(ii["date"]),
+          "date": pd.to_datetime(ii["date"]) + pd.Timedelta(hours=9),
           # "data": pd.DataFrame(columns=["views", "likes", "comments"])
         }
   # print(id_set, flush=True)
@@ -132,6 +135,49 @@ def each_calc(scanned_data, category_key="date_25"):
       master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["comments"])
       
   return master_views_df, master_likes_df, master_comments_df, master_dict
+
+###### Function Description #####
+## input parameters:
+## view_df index: pd.Timestamp, columns: id
+## start_sr: index: id, values: pd.Timestamp
+## end_offset: int [days]
+## returns pd.Series
+def get_speed(view_df, start_sr, end_offset=1):
+  res_sr = pd.Series(index=view_df.columns)
+  end_sr = start_sr + pd.Timedelta(days=end_offset)
+  end_sr_min = end_sr - pd.Timedelta(minutes=30)
+  end_sr_max = end_sr + pd.Timedelta(minutes=30)
+  
+  for id in view_df.columns:
+    end_view_sr = view_df[id][(end_sr_min[id] <= view_df[id].index) & (view_df[id].index <= end_sr_max[id])]
+    end_view_sr.dropna(inplace=True)
+    if len(end_view_sr) > 0:
+      res_sr[id] = end_view_sr.iloc[-1] / end_offset
+      
+  return res_sr
+
+###### Function Description #####
+## input parameters:
+## view_df index: pd.Timestamp, columns: id
+## end_offset: int [days]
+## returns pd.Series
+def get_now_speed(view_df, end_offset=1):
+  res_sr = pd.Series(index=view_df.columns)
+  start = now
+  start_min = now - pd.Timedelta(hours=1)
+  end = start - pd.Timedelta(days=end_offset)
+  end_min = end - pd.Timedelta(hours=1)
+  
+  for id in view_df.columns:
+    start_view_sr = view_df[id][(start_min <= view_df[id].index) & (view_df[id].index <= start)]
+    end_view_sr = view_df[id][(end_min <= view_df[id].index) & (view_df[id].index <= end)]
+    start_view_sr.dropna(inplace=True)
+    end_view_sr.dropna(inplace=True)
+    if len(start_view_sr) > 0 and len(end_view_sr) > 0:
+      res_sr[id] = (start_view_sr.iloc[-1] - end_view_sr.iloc[-1]) / end_offset
+      
+  return res_sr
+  
 
 ###### scheme of input df ######
 ## columns = list of video ids
@@ -163,12 +209,18 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_date_25_info.sort_values("date", ascending=False, inplace=True)
   df_date_25_info["title"] = df_date_25_info["id"].apply(lambda id: master_dict[id]["title"])
   df_date_25_info["view"] = df_date_25_info["id"].map(df_date_views.max())
+  df_date_25_info["day1_view_speed"] = get_speed(df_date_views, start=df_date_25_info["date"], end_offset=1)
+  df_date_25_info["day3_view_speed"] = get_speed(df_date_views, start=df_date_25_info["date"], end_offset=3)  
+  df_date_25_info["now1_view_speed"] = get_now_speed(df_date_views, end_offset=1)
+  df_date_25_info["now3_view_speed"] = get_now_speed(df_date_views, end_offset=3)
   
   df_view_25_info = pd.DataFrame(df_view_views.columns, columns=["id"])
   df_view_25_info["view"] = df_view_25_info["id"].map(df_view_views.max())
   df_view_25_info.sort_values("view", ascending=False, inplace=True)
   df_view_25_info["title"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["title"])
   df_view_25_info["date"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["date"])
+  df_view_25_info["now1_view_speed"] = get_now_speed(df_view_views, end_offset=1)
+  df_view_25_info["now3_view_speed"] = get_now_speed(df_view_views, end_offset=3)
   
   df_date_25_info.to_csv("summary_list.csv", index=False, encoding='utf-8')
   df_view_25_info.to_csv("summary_list.csv", index=False, encoding='utf-8', mode='a')
@@ -180,13 +232,13 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
     for df_prefix, df in zip(["[views]", "[likes]", "[comments]"], [master_views_df, master_likes_df, master_comments_df]):
       for id in df.columns:
         fig_title = df_prefix + " " + master_dict[id]["title"]
-        fig_name = df_prefix + id + category_key
+        fig_name = category_key + id + df_prefix
         video_sr = df[id].dropna()
         try:
           make_timeline(video_sr.index, video_sr, figname=fig_name, plt_title=fig_title)
         except Exception as e:
           print(e)
-          print(f"ERROR at make_timeline for {id}, {category_key}")
+          print(f"ERROR at make_timeline for {id}, {df_prefix}")
           video_sr.to_csv(fig_name + ".csv")
       
 if __name__ == "__main__":
@@ -201,5 +253,6 @@ if __name__ == "__main__":
     df_date_views, df_date_likes, df_date_comments, date_master_dict = each_calc(scanned_data, category_key="date_25")
     df_view_views, df_view_likes, df_view_comments, view_master_dict = each_calc(scanned_data, category_key="view_25")
     merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, df_view_views, df_view_likes, df_view_comments, date_master_dict, view_master_dict)
+    agg_calc(scanned_data)
   # else:
   #   agg_calc([], local=True)
