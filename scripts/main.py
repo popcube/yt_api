@@ -209,8 +209,8 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_date_25_info.sort_values("date", ascending=False, inplace=True)
   df_date_25_info["title"] = df_date_25_info["id"].apply(lambda id: master_dict[id]["title"])
   df_date_25_info["view"] = df_date_25_info["id"].map(df_date_views.max())
-  df_date_25_info["day1_view_speed"] = get_speed(df_date_views, start=df_date_25_info["date"], end_offset=1)
-  df_date_25_info["day3_view_speed"] = get_speed(df_date_views, start=df_date_25_info["date"], end_offset=3)  
+  df_date_25_info["day1_view_speed"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=1)
+  df_date_25_info["day3_view_speed"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=3)  
   df_date_25_info["now1_view_speed"] = get_now_speed(df_date_views, end_offset=1)
   df_date_25_info["now3_view_speed"] = get_now_speed(df_date_views, end_offset=3)
   
