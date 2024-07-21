@@ -1,6 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 import sys, os
+import csv
 
 from dyn_api import main as scan_data
 from make_timeline import make_timeline
@@ -53,12 +54,13 @@ def agg_calc(scanned_data):
   print("##### change flag df #####")
   print(change_flag_df)
   print()
-  print("##### True point in change flag df #####")
+  print("##### Trues in change flag df #####")
   print(change_flag_view_25[change_flag_df["view_25_changed"] == True])
   print(change_flag_date_25[change_flag_df["date_25_changed"] == True], flush=True)
-
-  agg_df_view_25_diff = agg_df["view_25_views"].diff()
-  agg_df_date_25_diff = agg_df["date_25_views"].diff()
+  
+  agg_df_index_diff = agg_df.index.to_series().diff().apply(lambda x: x.total_seconds())
+  agg_df_view_25_diff = agg_df["view_25_views"].diff() / agg_df_index_diff
+  agg_df_date_25_diff = agg_df["date_25_views"].diff() / agg_df_index_diff
 
   agg_df_view_25_diff.loc[change_flag_view_25] = float('nan')
   agg_df_date_25_diff.loc[change_flag_date_25] = float('nan')
@@ -99,8 +101,8 @@ def show_progress(idx, target_len):
   elif idx in milestone_list:
     print(f"{milestone_list.index(idx) * 10}% ...", flush=True)  
 
-def each_calc(scanned_data, category_key="date_25"):
-  master_dict = dict()
+## note that data of master_dict can change in the caller's side when changed in the called function
+def each_calc(scanned_data, master_dict, category_key="date_25"):
   for i in scanned_data:
     ## for every element in scanned_data, title can be included for all or excluded for all
     ## one sample of vid suffices to say that the element has title for all vids or not
@@ -108,7 +110,7 @@ def each_calc(scanned_data, category_key="date_25"):
       for ii in i[category_key]["videos"]:
         master_dict[ii["id"]] = {
           "title": ii["title"],
-          "date": ii["date"],
+          "date": pd.Timestamp(ii["date"]),
           # "data": pd.DataFrame(columns=["views", "likes", "comments"])
         }
   # print(id_set, flush=True)
@@ -126,18 +128,54 @@ def each_calc(scanned_data, category_key="date_25"):
       master_views_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["views"])
       master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["likes"])
       master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["comments"])
+      
+  return master_views_df, master_likes_df, master_comments_df
+
+###### scheme of input df ######
+## columns = list of video ids
+## index = timestamp
+def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, df_view_views, df_view_likes, df_view_comments):
   
-  for df_suffix, df in zip(["_views", "_likes", "_comments"], [master_views_df, master_likes_df, master_comments_df]):
-    for id in df.columns:
-      fig_title = master_dict[id]["title"] + "_" + category_key + df_suffix
-      fig_name = category_key + df_suffix + "_" + id
-      video_sr = df[id].dropna()
-      try:
-        make_timeline(video_sr.index, video_sr, figname=fig_name, plt_title=fig_title)
-      except Exception as e:
-        print(e)
-        print(f"ERROR at make_timeline for {id}, {category_key}")
-        video_sr.to_csv(fig_name + ".csv")
+  ## merge the video date when duplicated in date and view dfs
+  for df_date, df_view in zip([df_date_views, df_date_likes, df_date_comments], [df_view_views, df_view_likes, df_view_comments]):
+    df_date_redundant_columns = []
+    for date_column in df_date.columns:
+      if date_column in df_view.columns:
+        df_date_redundant_columns.append(date_column)
+        # merge the Series with the first values for the dupe index
+        df_view[date_column] = pd.concat([df_date[date_column], df_view[date_column]]).groupby(level=0).first()
+    df_date.drop(columns=df_date_redundant_columns)
+  
+  df_date_25_info = pd.DataFrame(df_date_views.columns, columns=["id"])
+  df_date_25_info["date"] = df_date_25_info[id].apply(lambda id: master_dict[id]["date"])
+  df_date_25_info.sort_values("date", ascending=False)
+  df_date_25_info["title"] = df_date_25_info[id].apply(lambda id: master_dict[id]["title"])
+  df_date_25_info["view"] = df_date_25_info[id].map(df_date_views.max())
+  
+  df_view_25_info = pd.DataFrame(df_view_views.columns, columns=["id"])
+  df_view_25_info["view"] = df_view_25_info[id].map(df_view_views.max())
+  df_view_25_info.sort_values("view", ascending=False)
+  df_view_25_info["title"] = df_view_25_info[id].apply(lambda id: master_dict[id]["title"])
+  df_view_25_info["date"] = df_view_25_info[id].apply(lambda id: master_dict[id]["date"])
+  
+  df_date_25_info.to_csv("summary_list.csv", encoding='utf-8')
+  df_view_25_info.to_csv("summary_list.csv", encoding='utf-8', mode='a')
+        
+  for category_key, master_views_df, master_likes_df, master_comments_df in [
+    ["[date_25]", df_date_views, df_date_likes, df_date_comments],
+    ["[view_25]", df_view_views, df_view_likes, df_view_comments]
+  ]:
+    for df_prefix, df in zip(["[views]", "[likes]", "[comments]"], [master_views_df, master_likes_df, master_comments_df]):
+      for id in df.columns:
+        fig_title = df_prefix + " " + master_dict[id]["title"]
+        fig_name = df_prefix + id + category_key
+        video_sr = df[id].dropna()
+        try:
+          make_timeline(video_sr.index, video_sr, figname=fig_name, plt_title=fig_title)
+        except Exception as e:
+          print(e)
+          print(f"ERROR at make_timeline for {id}, {category_key}")
+          video_sr.to_csv(fig_name + ".csv")
       
 if __name__ == "__main__":
   if os.environ.get("AWS_ACCESS_KEY_ID"):
@@ -148,8 +186,9 @@ if __name__ == "__main__":
     for idx in range(len(scanned_data)):
       scanned_data[idx]["fetch_time"] = pd.to_datetime(scanned_data[idx]["fetch_time"]) + pd.Timedelta(hours=9)    
     
-    each_calc(scanned_data, "date_25")
-    each_calc(scanned_data, "view_25")
-    agg_calc(scanned_data)
+    master_dict = dict()
+    df_date_views, df_date_likes, df_date_comments = each_calc(scanned_data, master_dict, "date_25")
+    df_view_views, df_view_likes, df_view_comments = each_calc(scanned_data, master_dict, "view_25")
+    merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, df_view_views, df_view_likes, df_view_comments)
   # else:
   #   agg_calc([], local=True)
