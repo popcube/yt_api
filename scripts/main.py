@@ -147,16 +147,16 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
     df_date.drop(columns=df_date_redundant_columns)
   
   df_date_25_info = pd.DataFrame(df_date_views.columns, columns=["id"])
-  df_date_25_info["date"] = df_date_25_info[id].apply(lambda id: master_dict[id]["date"])
+  df_date_25_info["date"] = df_date_25_info["id"].apply(lambda id: master_dict[id]["date"])
   df_date_25_info.sort_values("date", ascending=False)
-  df_date_25_info["title"] = df_date_25_info[id].apply(lambda id: master_dict[id]["title"])
-  df_date_25_info["view"] = df_date_25_info[id].map(df_date_views.max())
+  df_date_25_info["title"] = df_date_25_info["id"].apply(lambda id: master_dict[id]["title"])
+  df_date_25_info["view"] = df_date_25_info["id"].map(df_date_views.max())
   
   df_view_25_info = pd.DataFrame(df_view_views.columns, columns=["id"])
-  df_view_25_info["view"] = df_view_25_info[id].map(df_view_views.max())
+  df_view_25_info["view"] = df_view_25_info["id"].map(df_view_views.max())
   df_view_25_info.sort_values("view", ascending=False)
-  df_view_25_info["title"] = df_view_25_info[id].apply(lambda id: master_dict[id]["title"])
-  df_view_25_info["date"] = df_view_25_info[id].apply(lambda id: master_dict[id]["date"])
+  df_view_25_info["title"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["title"])
+  df_view_25_info["date"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["date"])
   
   df_date_25_info.to_csv("summary_list.csv", encoding='utf-8')
   df_view_25_info.to_csv("summary_list.csv", encoding='utf-8', mode='a')
