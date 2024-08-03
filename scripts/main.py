@@ -240,8 +240,8 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_view_25_info["now7_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=7)
   df_view_25_info["now30_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=30)
   
-  df_date_25_info.to_csv("summary_list.csv", index=False, encoding='utf-8', float_format='%.1f')
-  df_view_25_info.to_csv("summary_list.csv", index=False, encoding='utf-8', float_format='%.1f', mode='a')
+  df_date_25_info.to_csv("summary_list.csv", index=True, encoding='utf-8', float_format='%.1f')
+  df_view_25_info.to_csv("summary_list.csv", index=True, encoding='utf-8', float_format='%.1f', mode='a')
         
   for category_key, master_views_df, master_likes_df, master_comments_df in [
     ["[date_25]", df_date_views, df_date_likes, df_date_comments],
