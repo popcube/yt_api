@@ -100,7 +100,7 @@ def show_progress(idx, target_len):
   milestone_list = range(0, target_len, int(target_len / 10))
   if idx == 0:
     print()
-    print("##### Processing start #####")
+    print("##### Processing start #####", flush=True)
   elif idx in milestone_list:
     print(f"{milestone_list.index(idx) * 10}% ...", flush=True)  
 
@@ -183,7 +183,7 @@ def get_now_speed(view_df, end_offset=1):
     start_view_sr.dropna(inplace=True)
     end_view_sr.dropna(inplace=True)
     if len(start_view_sr) > 0 and len(end_view_sr) > 0:
-      past_days = (end_view_sr.index[-1] - start_view_sr.index[-1]).total_seconds() / (60*60*24)
+      past_days = (start_view_sr.index[-1] - end_view_sr.index[-1]).total_seconds() / (60*60*24)
       res_sr[id] = (start_view_sr.iloc[-1] - end_view_sr.iloc[-1]) / past_days
       
   return res_sr
