@@ -134,6 +134,11 @@ def each_calc(scanned_data, category_key="date_25"):
       master_likes_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["likes"])
       master_comments_df.loc[data["fetch_time"], video_data_point["id"]] = int(video_data_point["comments"])
       
+  ## unofficial way to name DataFrame
+  master_views_df.name = "views"
+  master_likes_df.name = "likes"
+  master_comments_df.name = "comments"
+      
   return master_views_df, master_likes_df, master_comments_df, master_dict
 
 ###### Function Description ######
@@ -211,7 +216,7 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
     df_view[dupe_cols] = pd.concat([df_date[dupe_cols], df_view[dupe_cols]]).groupby(level=0).first()
     df_date.drop(columns=dupe_cols, inplace=True)
     
-  ## from here onwards, there's only one master_dict
+  ## from here onwards, only one master_dict
   master_dict = date_master_dict | view_master_dict
   
   df_date_25_info = pd.DataFrame(df_date_views.columns, columns=["id"])
@@ -220,14 +225,18 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_date_25_info["title"] = df_date_25_info["id"].apply(lambda id: master_dict[id]["title"])
   df_date_25_info["view"] = df_date_25_info["id"].map(df_date_views.max())
   df_date_25_info.set_index("id", inplace=True)
-  df_date_25_info["day1_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=1)
-  df_date_25_info["day3_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=3)
-  df_date_25_info["day7_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=7)
-  df_date_25_info["day30_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=30)
-  df_date_25_info["now1_view_speed[/day]"] = get_now_speed(df_date_views, end_offset=1)
-  df_date_25_info["now3_view_speed[/day]"] = get_now_speed(df_date_views, end_offset=3)
-  df_date_25_info["now7_view_speed[/day]"] = get_now_speed(df_date_views, end_offset=7)
-  df_date_25_info["now30_view_speed[/day]"] = get_now_speed(df_date_views, end_offset=30)
+  for df_date_temp in [df_date_views, df_date_likes, df_date_comments]:
+    for period_day in [1, 7, 30, 90]:
+      df_date_25_info[f"day{period_day}_{df_date_temp.name}_speed[/day]"] = get_speed(
+        df_date_temp, start_sr=df_date_25_info["date"], end_offset=period_day)
+      # df_date_25_info["day3_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=3)
+      # df_date_25_info["day7_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=7)
+      # df_date_25_info["day30_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=30)
+      df_date_25_info[f"now{period_day}_{df_date_temp.name}_speed[/day]"] = get_now_speed(
+        df_date_temp, end_offset=period_day)
+      # df_date_25_info["now3_view_speed[/day]"] = get_now_speed(df_date_views, end_offset=3)
+      # df_date_25_info["now7_view_speed[/day]"] = get_now_speed(df_date_views, end_offset=7)
+      # df_date_25_info["now30_view_speed[/day]"] = get_now_speed(df_date_views, end_offset=30)
   
   df_view_25_info = pd.DataFrame(df_view_views.columns, columns=["id"])
   df_view_25_info["view"] = df_view_25_info["id"].map(df_view_views.max())
@@ -235,11 +244,14 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_view_25_info["title"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["title"])
   df_view_25_info["date"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["date"])
   df_view_25_info.set_index("id", inplace=True)
-  df_view_25_info["now1_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=1)
-  df_view_25_info["now3_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=3)
-  df_view_25_info["now7_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=7)
-  df_view_25_info["now30_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=30)
-  
+  for df_view_temp in [df_view_views, df_view_likes, df_view_comments]:
+    for period_day in [1, 7, 30, 90]:
+      df_view_25_info[f"now{period_day}_{df_date_temp.name}_speed[/day]"] = get_now_speed(
+        df_view_temp, end_offset=period_day)
+      # df_view_25_info["now3_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=3)
+      # df_view_25_info["now7_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=7)
+      # df_view_25_info["now30_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=30)
+      
   df_date_25_info.to_csv("summary_list.csv", index=True, encoding='utf-8', float_format='%.1f')
   df_view_25_info.to_csv("summary_list.csv", index=True, encoding='utf-8', float_format='%.1f', mode='a')
         
