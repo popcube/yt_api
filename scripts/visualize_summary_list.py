@@ -73,8 +73,20 @@ def latest_views(df):
   plt.savefig("./local/latest_views.png")
   plt.close()
 
+if __name__ == "__main__":
+  src_csv_path = "./summary_list.csv"
+  break_row = 0
+  with open(src_csv_path, "r", encoding="utf-8") as f:
+    for idx, line in enumerate(f):
+      if line.startswith("id,") and idx != 0:
+        break_row = idx
+        break
+      
+  # print(break_idx)
+  # sys.exit(0)
 
-df = pd.read_csv("./summary_list.csv", skiprows=73, encoding="utf-8", parse_dates=True)
-top_views(df)
-df = pd.read_csv("./summary_list.csv", skiprows=range(74,120), encoding="utf-8", parse_dates=True)
-latest_views(df)
+
+  df = pd.read_csv(src_csv_path, nrows=break_row, encoding="utf-8", parse_dates=True)
+  latest_views(df)
+  df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True)
+  top_views(df)
