@@ -6,17 +6,21 @@ import sys
 plt.rcParams["font.family"] = "IPAexGothic"
 
 
-def top_views(df):
-  data_cols=["now30_view_speed[/day]","now7_view_speed[/day]","now3_view_speed[/day]","now1_view_speed[/day]"]
+def top_data_show(df):
+  global local_str
+  # data_cols=["now30_view_speed[/day]","now7_view_speed[/day]","now3_view_speed[/day]","now1_view_speed[/day]"]
   # for col in data_cols:
   #   df[col] = -1 * df[col]
 
-  x_axis = ["30days", "7days", "3days", "1day"]
+  # x_axis = ["30days", "7days", "3days", "1day"]
+  data_cols = df.columns[df.columns != "title"]
+  x_axis = [col.split("_")[0] for col in data_cols]
+  data_category = data_cols[0].split("_")[1]
   # cm_colors = plt.cm.get_cmap("Dark2").colors
   cm_colors = plt.cm.get_cmap("tab20").colors
 
   plt.figure(figsize=(7, 7))
-  for idx in df.index[:13]:
+  for idx in df[data_cols].dropna(how="all").index[:13]:
     plt.plot(
       x_axis,
       df.loc[idx, data_cols],
@@ -30,20 +34,25 @@ def top_views(df):
     # if df.loc[idx, data_cols].mean() < 1000:
     #   print(df.loc[idx, data_cols])
   plt.legend(loc="upper left", bbox_to_anchor=(0, 0.8))
-  plt.title("現在より○日前までの再生数増加率平均[views/day]")
+  plt.title(f"現在より○日前までの{data_category}増加率平均[views/day]")
   plt.tight_layout()
     
   # plt.show()
-  plt.savefig("./local/top_views.png")
+  plt.savefig(f"./{local_str}top_{data_category}.png")
   plt.close()
   
-def latest_views(df):
+def latest_data_show(df):
+  global local_str
   # data_cols=["now30_view_speed[/day]","now7_view_speed[/day]","now3_view_speed[/day]","now1_view_speed[/day]"]
-  data_cols=["day30_view_speed[/day]","day7_view_speed[/day]","day3_view_speed[/day]","day1_view_speed[/day]"]
+  # data_cols=["day30_view_speed[/day]","day7_view_speed[/day]","day3_view_speed[/day]","day1_view_speed[/day]"]
+  # data_cols=df.columns
   # for col in data_cols:
   #   df[col] = -1 * df[col]
 
-  x_axis = ["30days", "7days", "3days", "1day"]
+  # x_axis = ["30days", "7days", "3days", "1day"]
+  data_cols = df.columns[df.columns != "title"]
+  x_axis = [col.split("_")[0] for col in data_cols]
+  data_category = data_cols[0].split("_")[1]
   # cm_colors = plt.cm.get_cmap("Dark2").colors
   cm_colors = plt.cm.get_cmap("tab10").colors
 
@@ -65,16 +74,17 @@ def latest_views(df):
     #   print(df.loc[idx, data_cols].apply(type))
     #   print(e)
   plt.legend(loc="upper left", bbox_to_anchor=(0, 1), framealpha=0)
-  plt.title("リリースより○日後までの再生数増加率平均[views/day]")
+  plt.title(f"リリースより○日後までの{data_category}増加率平均[views/day]")
   plt.tight_layout()
     
   # plt.show()
   # sys.exit(9)
-  plt.savefig("./local/latest_views.png")
+  plt.savefig(f"./{local_str}latest_{data_category}.png")
   plt.close()
 
 if __name__ == "__main__":
-  src_csv_path = "./summary_list.csv"
+  local_str = "local/" if len(sys.argv) > 1 else ""
+  src_csv_path = f"./{local_str}summary_list.csv"
   break_row = 0
   with open(src_csv_path, "r", encoding="utf-8") as f:
     for idx, line in enumerate(f):
@@ -87,6 +97,10 @@ if __name__ == "__main__":
 
 
   df = pd.read_csv(src_csv_path, nrows=break_row, encoding="utf-8", parse_dates=True)
-  latest_views(df)
+  latest_data_show(df.filter(regex="title|_views_speed"))
+  latest_data_show(df.filter(regex="title|_likes_speed"))
+  latest_data_show(df.filter(regex="title|_comments_speed"))
   df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True)
-  top_views(df)
+  top_data_show(df.filter(regex="title|_views_speed"))
+  top_data_show(df.filter(regex="title|_likes_speed"))
+  top_data_show(df.filter(regex="title|_comments_speed"))
