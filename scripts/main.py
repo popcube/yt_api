@@ -226,7 +226,7 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_date_25_info["view"] = df_date_25_info["id"].map(df_date_views.max())
   df_date_25_info.set_index("id", inplace=True)
   for df_date_temp in [df_date_views, df_date_likes, df_date_comments]:
-    for period_day in [1, 7, 30, 90]:
+    for period_day in [1, 3, 7, 10, 30, 90]:
       df_date_25_info[f"day{period_day}_{df_date_temp.name}_speed[/day]"] = get_speed(
         df_date_temp, start_sr=df_date_25_info["date"], end_offset=period_day)
       # df_date_25_info["day3_view_speed[/day]"] = get_speed(df_date_views, start_sr=df_date_25_info["date"], end_offset=3)
@@ -245,7 +245,7 @@ def merge_data_and_make_graphs(df_date_views, df_date_likes, df_date_comments, d
   df_view_25_info["date"] = df_view_25_info["id"].apply(lambda id: master_dict[id]["date"])
   df_view_25_info.set_index("id", inplace=True)
   for df_view_temp in [df_view_views, df_view_likes, df_view_comments]:
-    for period_day in [1, 7, 30, 90]:
+    for period_day in [1, 3, 7, 10, 30, 90]:
       df_view_25_info[f"now{period_day}_{df_view_temp.name}_speed[/day]"] = get_now_speed(
         df_view_temp, end_offset=period_day)
       # df_view_25_info["now3_view_speed[/day]"] = get_now_speed(df_view_views, end_offset=3)
