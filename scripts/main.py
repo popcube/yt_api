@@ -147,7 +147,7 @@ def each_calc(scanned_data, category_key="date_25"):
 ## start_sr: index: id, values: pd.Timestamp
 ## end_offset: int [days]
 ## returns pd.Series
-def get_speed(view_df, start_sr, end_offset=1):
+def get_speed(view_df, start_sr, end_offset):
   ## valid time window is 1 hour when the offset is shorter than 7 days
   ## for longer period, 1 day
   valid_time_window = 60 if end_offset < 7 else 60*24 # [min]
@@ -172,7 +172,7 @@ def get_speed(view_df, start_sr, end_offset=1):
 ## view_df index: pd.Timestamp, columns: id
 ## end_offset: int [days]
 ## returns pd.Series
-def get_now_speed(view_df, end_offset=1):
+def get_now_speed(view_df, end_offset):
   ## valid time window is 1 hour when the offset is shorter than 7 days
   ## for longer period, 1 day
   valid_time_window = 60 if end_offset < 7 else 60*24 # [min]
