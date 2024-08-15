@@ -19,10 +19,10 @@ def top_data_show(df: pd.DataFrame):
   x_axis = [col.split("_")[0] for col in data_cols]
   data_category = data_cols[0].split("_")[1]
   # cm_colors = plt.cm.get_cmap("Dark2").colors
-  cm_colors = plt.get_cmap("tab20").colors
+  cm_colors = plt.get_cmap("tab10").colors
 
   plt.figure(figsize=(12, 7))
-  for i, idx in enumerate(df[data_cols].dropna(how="all").index[:13]):
+  for i, idx in enumerate(df[data_cols].dropna(how="all").index[:25]):
     plt.plot(
       x_axis,
       df.loc[idx, data_cols],
@@ -35,6 +35,7 @@ def top_data_show(df: pd.DataFrame):
     )
     # if df.loc[idx, data_cols].mean() < 1000:
     #   print(df.loc[idx, data_cols])
+  plt.yscale("log")
   plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
   plt.title(f"現在より○日前までの{data_category}増加速度[views/day]")
   plt.tight_layout()
@@ -62,10 +63,6 @@ def latest_data_show(df: pd.DataFrame):
 
     plt.figure(figsize=(12, 7))
     for i, idx in enumerate(df[data_cols].dropna(how="all").index[:25]):
-      # if idx == "7WryveKlyX8":
-      #   print(df.loc[idx, data_cols])
-        # sys.exit(0)
-      # try:
       plt.plot(
         x_axis,
         df.loc[idx, data_cols].apply(float),
@@ -80,6 +77,7 @@ def latest_data_show(df: pd.DataFrame):
       #   print(df.loc[idx-1, data_cols].apply(type))
       #   print(df.loc[idx, data_cols].apply(type))
       #   print(e)
+    plt.yscale("log")
     plt.legend(loc="upper left", bbox_to_anchor=(1, 1), framealpha=0)
     if daynow == "day":
       plt.title(f"リリースより○日後までの{data_category}増加速度[views/day]")
@@ -105,12 +103,13 @@ if __name__ == "__main__":
   # sys.exit(0)
 
 
-  df = pd.read_csv(src_csv_path, nrows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
-  # print(df.filter(regex="title|_views_speed").head())
+  df = pd.read_csv(src_csv_path, nrows=break_row -1, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
+  # print(df.filter(regex="title|_views_speed").tail())
   latest_data_show(df.filter(regex="title|_views_speed"))
   latest_data_show(df.filter(regex="title|_likes_speed"))
   latest_data_show(df.filter(regex="title|_comments_speed"))
   df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
+  # print(df.filter(regex="title|_views_speed").head())
   top_data_show(df.filter(regex="title|_views_speed"))
   top_data_show(df.filter(regex="title|_likes_speed"))
   top_data_show(df.filter(regex="title|_comments_speed"))
