@@ -27,6 +27,7 @@ jobs:
       continue-on-error: true
       run: |
         python ./scripts/main.py
+        echo $(TZ=JST-9 date +"%Y/%m/%d %H:%M:%S") | tee GENERATED_DATE.csv
         python ./scripts/visualize_summary_list.py
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DYN_ACC_KEY }}
