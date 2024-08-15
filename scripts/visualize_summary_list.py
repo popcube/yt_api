@@ -1,13 +1,46 @@
 from matplotlib import pyplot as plt
 import pandas as pd
 import sys
+from functools import partial
+# import numpy as np
 
 
 plt.rcParams["font.family"] = "IPAexGothic"
+    
+# def yscale_f_forward(x_list: list):
+#   res_list = []
+#   for x in x_list:
+#     if x >= 1:
+#       res_list.append(np.power(10.0, x))
+#     elif x > -1:
+#       res_list.append(x * 10)
+#     else:
+#       res_list.append(-1 * np.power(10.0, abs(x)))
+#   return np.array(res_list)
+  
+# def yscale_f_backward(x_list: list):
+#   res_list = []
+#   for x in x_list:
+#     if x >= 10:
+#       res_list.append(np.log(10.0, x))
+#     elif x > -10:
+#       res_list.append(x / 10)
+#     else:
+#       res_list.append(-1 * np.log(10.0, abs(x)))
+#   return np.array(res_list)
+def func_data_lim(x, data_lim=(None, None)):
+  ok_flag = True
+  if data_lim[0] is not None:
+    if x < data_lim[0]:
+      ok_flag = False
+  if data_lim[1] is not None:
+    if x > data_lim[1]:
+      ok_flag = False
+  return x if ok_flag else None
 
-
-def top_data_show(df: pd.DataFrame):
+def top_data_show(df: pd.DataFrame, data_lim=(None, None)):
   global local_str
+  apply_data_lim = partial(func_data_lim, data_lim=data_lim)
   # data_cols=["now30_view_speed[/day]","now7_view_speed[/day]","now3_view_speed[/day]","now1_view_speed[/day]"]
   # for col in data_cols:
   #   df[col] = -1 * df[col]
@@ -22,10 +55,10 @@ def top_data_show(df: pd.DataFrame):
   cm_colors = plt.get_cmap("tab10").colors
 
   plt.figure(figsize=(12, 7))
-  for i, idx in enumerate(df[data_cols].dropna(how="all").index[:25]):
+  for i, idx in enumerate(df[data_cols].dropna(how="all").index[:30]):
     plt.plot(
       x_axis,
-      df.loc[idx, data_cols],
+      df.loc[idx, data_cols].apply(apply_data_lim),
       color=cm_colors[i % len(cm_colors)],
       marker='o',
       linestyle='dashed',
@@ -36,16 +69,18 @@ def top_data_show(df: pd.DataFrame):
     # if df.loc[idx, data_cols].mean() < 1000:
     #   print(df.loc[idx, data_cols])
   plt.yscale("log")
+  # plt.yscale("function", functions=(yscale_f_forward, yscale_f_backward))
   plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
-  plt.title(f"現在より○日前までの{data_category}増加速度[views/day]")
+  plt.title(f"現在より○日前までの{data_category}速度[views/day]")
   plt.tight_layout()
     
   # plt.show()
   plt.savefig(f"./{local_str}top_now_{data_category}.png")
   plt.close()
   
-def latest_data_show(df: pd.DataFrame):
+def latest_data_show(df: pd.DataFrame, data_lim=(None, None)):
   global local_str
+  apply_data_lim = partial(func_data_lim, data_lim=data_lim)
   # data_cols=["now30_view_speed[/day]","now7_view_speed[/day]","now3_view_speed[/day]","now1_view_speed[/day]"]
   # data_cols=["day30_view_speed[/day]","day7_view_speed[/day]","day3_view_speed[/day]","day1_view_speed[/day]"]
   # data_cols=df.columns
@@ -65,7 +100,7 @@ def latest_data_show(df: pd.DataFrame):
     for i, idx in enumerate(df[data_cols].dropna(how="all").index[:25]):
       plt.plot(
         x_axis,
-        df.loc[idx, data_cols].apply(float),
+        df.loc[idx, data_cols].apply(float).apply(apply_data_lim),
         color=cm_colors[i % len(cm_colors)],
         marker=['o', '^', 's', 'D', "x", "+"][i // len(cm_colors)],
         linestyle='dashed',
@@ -80,9 +115,9 @@ def latest_data_show(df: pd.DataFrame):
     plt.yscale("log")
     plt.legend(loc="upper left", bbox_to_anchor=(1, 1), framealpha=0)
     if daynow == "day":
-      plt.title(f"リリースより○日後までの{data_category}増加速度[views/day]")
+      plt.title(f"リリースより○日後までの{data_category}速度[views/day]")
     elif daynow == "now":
-      plt.title(f"現在より○日前までの{data_category}増加速度[views/day]")
+      plt.title(f"現在より○日前までの{data_category}速度[views/day]")
     plt.tight_layout()
       
     # plt.show()
@@ -107,9 +142,9 @@ if __name__ == "__main__":
   # print(df.filter(regex="title|_views_speed").tail())
   latest_data_show(df.filter(regex="title|_views_speed"))
   latest_data_show(df.filter(regex="title|_likes_speed"))
-  latest_data_show(df.filter(regex="title|_comments_speed"))
+  latest_data_show(df.filter(regex="title|_comments_speed"), data_lim=(0.1, None))
   df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
   # print(df.filter(regex="title|_views_speed").head())
   top_data_show(df.filter(regex="title|_views_speed"))
-  top_data_show(df.filter(regex="title|_likes_speed"))
-  top_data_show(df.filter(regex="title|_comments_speed"))
+  top_data_show(df.filter(regex="title|_likes_speed"), data_lim=(8, None))
+  top_data_show(df.filter(regex="title|_comments_speed"), data_lim=(0.1, None))
