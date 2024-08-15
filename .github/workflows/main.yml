@@ -1,4 +1,4 @@
-name: main
+name: yt_main
 on: 
   workflow_dispatch:
   push:
@@ -32,6 +32,7 @@ jobs:
     - name: upload data
       uses: actions/upload-artifact@v4
       with:
+        name: ${{ github.workflow }}.zip
         path: |
           ./*.png
           ./*.csv
