@@ -62,6 +62,9 @@ def latest_data_show(df: pd.DataFrame):
 
     plt.figure(figsize=(12, 7))
     for i, idx in enumerate(df[data_cols].dropna(how="all").index[:25]):
+      # if idx == "7WryveKlyX8":
+      #   print(df.loc[idx, data_cols])
+        # sys.exit(0)
       # try:
       plt.plot(
         x_axis,
@@ -102,11 +105,12 @@ if __name__ == "__main__":
   # sys.exit(0)
 
 
-  df = pd.read_csv(src_csv_path, nrows=break_row, encoding="utf-8", parse_dates=True)
+  df = pd.read_csv(src_csv_path, nrows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
+  # print(df.filter(regex="title|_views_speed").head())
   latest_data_show(df.filter(regex="title|_views_speed"))
   latest_data_show(df.filter(regex="title|_likes_speed"))
   latest_data_show(df.filter(regex="title|_comments_speed"))
-  df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True)
+  df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
   top_data_show(df.filter(regex="title|_views_speed"))
   top_data_show(df.filter(regex="title|_likes_speed"))
   top_data_show(df.filter(regex="title|_comments_speed"))
