@@ -97,7 +97,7 @@ def latest_data_show(df: pd.DataFrame, data_lim=(None, None)):
 
     # x_axis = ["30days", "7days", "3days", "1day"]
     data_cols = df.columns[df.columns.str.startswith(daynow)].sort_values(
-      key=lambda x: x.str[len(daynow):].str.split("_").str[0].astype(int), ascending=False)
+      key=lambda x: x.str[len(daynow):].str.split("_").str[0].astype(int), ascending=(daynow=="day"))
     x_axis = [col.split("_")[0][len(daynow):] for col in data_cols]
     data_category = data_cols[0].split("_")[1]
     # cm_colors = plt.cm.get_cmap("Dark2").colors
