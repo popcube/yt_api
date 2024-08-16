@@ -104,7 +104,7 @@ def latest_data_show(df: pd.DataFrame, data_lim=(None, None)):
     cm_colors = plt.get_cmap("tab10").colors
 
     plt.figure(figsize=(12, 7))
-    for i, idx in enumerate(df[data_cols].dropna(how="all").index[:25]):
+    for i, idx in enumerate(df[data_cols].dropna(how="all").index[:30]):
       plt.plot(
         x_axis,
         df.loc[idx, data_cols].apply(float).apply(apply_data_lim),
