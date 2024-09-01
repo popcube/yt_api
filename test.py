@@ -42,13 +42,13 @@ srch_queries = {
   # "type": "video",
   # "order": "date",
   "order": "viewCount",
-  "maxResults": 50
+  "maxResults": 25
 }
-res = requests.get(srch_base_url, params=srch_queries)
-with open("./local/temp.txt", "w", errors="ignore", encoding="utf-8") as f:
-  f.write(res.text)
+# res = requests.get(srch_base_url, params=srch_queries)
+# with open("./local/temp.txt", "w", errors="ignore", encoding="utf-8") as f:
+#   f.write(res.text)
   
-sys.exit(9)
+# sys.exit(9)
 
 with open("./local/temp.txt", "r", errors="ignore", encoding="utf-8") as f:
   temp_text = f.read()
@@ -59,13 +59,16 @@ res_items = [
   [
     res_item["snippet"]["publishedAt"],
     res_item["snippet"]["title"],
-    res_item["id"]["videoId"]
+    res_item["id"].get("videoId")
   ] for res_item in res_dict["items"]
 ]
 # print(res_items)
 res_df = pd.DataFrame(res_items, columns=["date", "title", "id"])
 res_df["date"] = pd.to_datetime(res_df["date"])
 res_df.set_index("date", inplace=True)
+print(res_df["id"].to_list())
+
+# sys.exit(0)
 # res_df = res_df.to_timestamp()
 print(res_df)
 vid_query_part = [
@@ -87,7 +90,7 @@ vid_queries = {
   "key": api_key,
   "part": ",".join(vid_query_part),
   # "id": "Vx25rib86pc,SKfNzeuWtNg"
-  "id": ",".join(res_df["id"])
+  "id": ",".join(res_df["id"].dropna().to_list() + ["lMXlOPGjwUI", "zw0JHV7nrUg"])
 }
 
 res = requests.get(vid_base_url, params=vid_queries)

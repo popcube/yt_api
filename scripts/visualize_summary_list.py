@@ -59,9 +59,10 @@ def top_data_show(df: pd.DataFrame, data_lim=(None, None)):
 
   plt.figure(figsize=(12, 7))
   for i, idx in enumerate(df[data_cols].index[:25]):
+    applied_data = df.loc[idx, data_cols].apply(apply_data_lim)
     plt.plot(
       x_axis,
-      df.loc[idx, data_cols].apply(apply_data_lim),
+      applied_data,
       color=cm_colors[i % len(cm_colors)],
       marker=['o', '^', 's', 'D', "x", "+"][i // len(cm_colors)],
       linestyle='dashed',
@@ -105,24 +106,26 @@ def latest_data_show(df: pd.DataFrame, data_lim=(None, None)):
 
     plt.figure(figsize=(12, 7))
     for i, idx in enumerate(df[data_cols].dropna(how="all").index[:30]):
-      plt.plot(
-        x_axis,
-        df.loc[idx, data_cols].apply(float).apply(apply_data_lim),
-        color=cm_colors[i % len(cm_colors)],
-        marker=['o', '^', 's', 'D', "x", "+"][i // len(cm_colors)],
-        linestyle='dashed',
-        linewidth=1,
-        markersize=5,
-        label=df.loc[idx, "date"].split()[0].replace("-", "/") + " " + \
-          df.loc[idx, 'title'].replace('&amp;','&'),
-      )
+      applied_data = df.loc[idx, data_cols].apply(apply_data_lim)
+      if len(applied_data.dropna(how="all")) > 0:
+        plt.plot(
+          x_axis,
+          df.loc[idx, data_cols].apply(float).apply(apply_data_lim),
+          color=cm_colors[i % len(cm_colors)],
+          marker=['o', '^', 's', 'D', "x", "+"][i // len(cm_colors)],
+          linestyle='dashed',
+          linewidth=1,
+          markersize=5,
+          label=df.loc[idx, "date"].split()[0].replace("-", "/") + " " + \
+            df.loc[idx, 'title'].replace('&amp;','&'),
+        )
       # except Exception as e:
       #   print(df.loc[idx-1, data_cols].apply(type))
       #   print(df.loc[idx, data_cols].apply(type))
       #   print(e)
     plt.yscale("log")
     plt.gca().yaxis.set_major_formatter("{x:,.1f}")
-    # plt.gca().yaxis.set_minor_formatter("{x:,.2f}")
+    plt.gca().yaxis.set_minor_formatter("{x:,.1f}")
     plt.legend(loc="upper left", bbox_to_anchor=(1, 1), framealpha=0)
     if daynow == "day":
       plt.title(f"リリースより○日後までの平均{data_category}速度[/day]", loc="left")
@@ -155,9 +158,9 @@ def main():
 
   df = pd.read_csv(src_csv_path, nrows=break_row -1, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
   # print(df.filter(regex="title|_views_speed").tail())
-  latest_data_show(df.filter(regex="title|(^date$)|_views_speed"))
-  latest_data_show(df.filter(regex="title|(^date$)|_likes_speed"))
-  latest_data_show(df.filter(regex="title|(^date$)|_comments_speed"), data_lim=(0.1, None))
+  latest_data_show(df.filter(regex="title|(^date$)|_views_speed"), data_lim=(60000, None))
+  latest_data_show(df.filter(regex="title|(^date$)|_likes_speed"), data_lim=(3000, None))
+  latest_data_show(df.filter(regex="title|(^date$)|_comments_speed"), data_lim=(200, None))
   df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
   # print(df.filter(regex="title|_views_speed").head())
   top_data_show(df.filter(regex="title|(^view$)|_views_speed"))

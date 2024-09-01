@@ -58,6 +58,15 @@ def view_25():
   }
   return query_25(srch_queries)
 
+def query_test(custom_params):
+  srch_queries = {
+    "key": api_key,
+    "channelId": ch_id,
+    "maxResults": 25,
+    **custom_params
+  }
+  return query_25(srch_queries)
+
 def parse_yt_date(item):
   if "liveStreamingDetails" in item.keys():
     if "actualStartTime" in item["liveStreamingDetails"]:
@@ -140,16 +149,41 @@ def main(view_ids=[], date_ids=[]):
     date_25_data = pd.DataFrame(date_ids, columns=["id"])
   else:
     date_25_data = date_25()
+    print("date_25_ids")
+    print(date_25_data["id"].to_list())
   
   if len(date_ids) > 0:
     view_25_data = pd.DataFrame(view_ids, columns=["id"])
   else:
     view_25_data = view_25()
-  
+    print("view_25_ids")
+    print(view_25_data["id"].to_list())
+    
   id_50 = pd.concat([date_25_data["id"], view_25_data["id"]], axis="index", ignore_index=True)    
   id_50.drop_duplicates(inplace=True)
   # print(id_50)
   # sys.exit(0)
+  
+  ## UPDATE HERE WHEN SEARCH QUERY IS FIXED TO RETURN lMXlOPGjwUI and zw0JHV7nrUg
+  ## replace doesn't replace when original value does not exit
+  if len(view_ids) == 0:
+    view_25_data_replace_index = view_25_data[
+      (view_25_data["id"] == "GTlQhMRHXIg") |
+      (view_25_data["id"] == "KvnS-TCq05Y") |
+      (view_25_data["id"] == "QdYji4SVH3A") |
+      (view_25_data["id"] == "bKKxLK_1ae8") |
+      (view_25_data["id"] == "S3lC1oBfVNQ") |
+      (view_25_data["id"] == "3VT85q-E-UU") |
+      (view_25_data["id"] == "N9PnTzC20D0") |
+      (view_25_data["id"] == "gr4FAlsibeg")
+    ].index
+    id_50.replace(view_25_data.loc[view_25_data_replace_index[:2], "id"].to_list(), ["lMXlOPGjwUI", "zw0JHV7nrUg"], inplace=True)
+    view_25_data.loc[view_25_data_replace_index[:2], ["id", "title", "date"]] = [
+      ["lMXlOPGjwUI", "Iなんです / 25時、ナイトコードで。 × 初音ミク", pd.to_datetime("2022-11-28 12:15:10", utc=True)],
+      ["zw0JHV7nrUg", "3周年アニバーサリーソング『NEO』", pd.to_datetime("2023-09-29 15:01:00", utc=True)],
+    ]
+    print("[TO BE DELETED] Dupdated view_25_ids")
+    print(view_25_data["id"].to_list())
   
   video_50_data = videos_50(id_50)
   print(f'{len(video_50_data)} videos are found!')
