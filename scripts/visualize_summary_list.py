@@ -8,28 +8,7 @@ from functools import partial
 
 
 plt.rcParams["font.family"] = "IPAexGothic"
-    
-# def yscale_f_forward(x_list: list):
-#   res_list = []
-#   for x in x_list:
-#     if x >= 1:
-#       res_list.append(np.power(10.0, x))
-#     elif x > -1:
-#       res_list.append(x * 10)
-#     else:
-#       res_list.append(-1 * np.power(10.0, abs(x)))
-#   return np.array(res_list)
-  
-# def yscale_f_backward(x_list: list):
-#   res_list = []
-#   for x in x_list:
-#     if x >= 10:
-#       res_list.append(np.log(10.0, x))
-#     elif x > -10:
-#       res_list.append(x / 10)
-#     else:
-#       res_list.append(-1 * np.log(10.0, abs(x)))
-#   return np.array(res_list)
+
 def func_data_lim(x, data_lim=(None, None)):
   ok_flag = True
   if data_lim[0] is not None:
@@ -45,10 +24,6 @@ def top_data_show(df: pd.DataFrame, data_lim=(None, None)):
   global gen_date
   apply_data_lim = partial(func_data_lim, data_lim=data_lim)
   # data_cols=["now30_view_speed[/day]","now7_view_speed[/day]","now3_view_speed[/day]","now1_view_speed[/day]"]
-  # for col in data_cols:
-  #   df[col] = -1 * df[col]
-  
-
   # x_axis = ["30days", "7days", "3days", "1day"]
   data_cols = df.columns[df.columns.str.startswith("now")].sort_values(
       key=lambda x: x.str[3:].str.split("_").str[0].astype(int), ascending=False)
@@ -67,14 +42,12 @@ def top_data_show(df: pd.DataFrame, data_lim=(None, None)):
       marker=['o', '^', 's', 'D', "x", "+"][i // len(cm_colors)],
       linestyle='dashed',
       linewidth=1,
-      markersize=5,
-      # label=df.loc[idx, "title"].replace("&amp;", "&"),      
+      markersize=5,    
       label=f"{df.loc[idx, 'view']:,} {df.loc[idx, 'title'].replace('&amp;', '&')}"
     )
     # if df.loc[idx, data_cols].mean() < 1000:
     #   print(df.loc[idx, data_cols])
   plt.yscale("log")
-  # plt.yscale("function", functions=(yscale_f_forward, yscale_f_backward))
   plt.gca().yaxis.set_major_formatter("{x:,.2f}")
   plt.gca().yaxis.set_minor_formatter("{x:,.2f}")
   plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
@@ -85,6 +58,8 @@ def top_data_show(df: pd.DataFrame, data_lim=(None, None)):
   plt.savefig(f"./{local_str}top_now_{data_category}.png")
   plt.close()
   
+
+  
 def latest_data_show(df: pd.DataFrame, data_lim=(None, None)):
   global local_str
   global gen_date
@@ -92,49 +67,70 @@ def latest_data_show(df: pd.DataFrame, data_lim=(None, None)):
   # data_cols=["now30_view_speed[/day]","now7_view_speed[/day]","now3_view_speed[/day]","now1_view_speed[/day]"]
   # data_cols=["day30_view_speed[/day]","day7_view_speed[/day]","day3_view_speed[/day]","day1_view_speed[/day]"]
   # data_cols=df.columns
-  # for col in data_cols:
-  #   df[col] = -1 * df[col]
-  for daynow in ["day", "now"]:
+  daynow = "day"
 
-    # x_axis = ["30days", "7days", "3days", "1day"]
-    data_cols = df.columns[df.columns.str.startswith(daynow)].sort_values(
-      key=lambda x: x.str[len(daynow):].str.split("_").str[0].astype(int), ascending=(daynow=="day"))
-    x_axis = [col.split("_")[0][len(daynow):] for col in data_cols]
-    data_category = data_cols[0].split("_")[1]
-    # cm_colors = plt.cm.get_cmap("Dark2").colors
-    cm_colors = plt.get_cmap("tab10").colors
+  # x_axis = ["30days", "7days", "3days", "1day"]
+  data_cols = df.columns[df.columns.str.startswith(daynow)].sort_values(
+    key=lambda x: x.str[len(daynow):].str.split("_").str[0].astype(int), ascending=(daynow=="day"))
+  x_axis = [col.split("_")[0][len(daynow):] for col in data_cols]
+  data_category = data_cols[0].split("_")[1]
+  # cm_colors = plt.cm.get_cmap("Dark2").colors
+  cm_colors = plt.get_cmap("tab10").colors
 
+  plt.figure(figsize=(12, 7))
+  for i, idx in enumerate(df[data_cols].dropna(how="all").index[:30]):
+    applied_data = df.loc[idx, data_cols].apply(apply_data_lim)
+    if len(applied_data.dropna(how="all")) > 0:
+      plt.plot(
+        x_axis,
+        df.loc[idx, data_cols].apply(float).apply(apply_data_lim),
+        color=cm_colors[i % len(cm_colors)],
+        marker=['o', '^', 's', 'D', "x", "+"][i // len(cm_colors)],
+        linestyle='dashed',
+        linewidth=1,
+        markersize=5,
+        label=df.loc[idx, "date"].split()[0].replace("-", "/") + " " + \
+          df.loc[idx, 'title'].replace('&amp;','&'),
+      )
+    # except Exception as e:
+    #   print(df.loc[idx-1, data_cols].apply(type))
+    #   print(df.loc[idx, data_cols].apply(type))
+    #   print(e)
+  plt.yscale("log")
+  plt.gca().yaxis.set_major_formatter("{x:,.1f}")
+  plt.gca().yaxis.set_minor_formatter("{x:,.1f}")
+  plt.legend(loc="upper left", bbox_to_anchor=(1, 1), framealpha=0)
+  if daynow == "day":
+    plt.title(f"リリースより○日後までの平均{data_category}速度[/day]", loc="left")
+  elif daynow == "now":
+    plt.title(f"{gen_date}より○日前までの平均{data_category}速度[/day]", loc="left")
+  plt.tight_layout()
+    
+  # plt.show()
+  plt.savefig(f"./{local_str}latest_{daynow}_{data_category}.png")
+  plt.close()
+    
+def ranking_hist(df: pd.DataFrame, prefix = ""):
+  prefix += "_" if prefix != "" else ""
+  
+  data_cats = df.columns[df.columns.str.startswith("now")]
+  cm_colors = plt.get_cmap("tab10").colors
+  cm_colors_dict = {k:v for k,v in zip(df.index, cm_colors*(len(df.index)//len(cm_colors)+1))}
+  for data_cat in data_cats:
     plt.figure(figsize=(12, 7))
-    for i, idx in enumerate(df[data_cols].dropna(how="all").index[:30]):
-      applied_data = df.loc[idx, data_cols].apply(apply_data_lim)
-      if len(applied_data.dropna(how="all")) > 0:
-        plt.plot(
-          x_axis,
-          df.loc[idx, data_cols].apply(float).apply(apply_data_lim),
-          color=cm_colors[i % len(cm_colors)],
-          marker=['o', '^', 's', 'D', "x", "+"][i // len(cm_colors)],
-          linestyle='dashed',
-          linewidth=1,
-          markersize=5,
-          label=df.loc[idx, "date"].split()[0].replace("-", "/") + " " + \
-            df.loc[idx, 'title'].replace('&amp;','&'),
-        )
-      # except Exception as e:
-      #   print(df.loc[idx-1, data_cols].apply(type))
-      #   print(df.loc[idx, data_cols].apply(type))
-      #   print(e)
-    plt.yscale("log")
-    plt.gca().yaxis.set_major_formatter("{x:,.1f}")
-    plt.gca().yaxis.set_minor_formatter("{x:,.1f}")
-    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), framealpha=0)
-    if daynow == "day":
-      plt.title(f"リリースより○日後までの平均{data_category}速度[/day]", loc="left")
-    elif daynow == "now":
-      plt.title(f"{gen_date}より○日前までの平均{data_category}速度[/day]", loc="left")
-    plt.tight_layout()
+    ds = df[data_cat].dropna().sort_values(ascending=False)
+    for i, ds_idx in enumerate(ds.index[:10]):
+      plt.bar(i+1, ds[ds_idx], color=cm_colors_dict[ds_idx], label=f"[{i+1}] " + df.loc[ds_idx, 'title'].replace('&amp;', '&'))
       
+    # plt.gca().xaxis.set_major_locator()
+    # plt.gca().xaxis.set_minor_formatter("{x:.0f}")
+    plt.xticks(range(1, 11))
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), framealpha=0)
+    plt.title(f"{gen_date}より{data_cat.split('_')[0][3:]}日前までの平均{data_cat.split('_')[1]}速度[/day]", loc="left")
+    
+    plt.tight_layout()
     # plt.show()
-    plt.savefig(f"./{local_str}latest_{daynow}_{data_category}.png")
+    plt.savefig(f"./{local_str}{prefix}{data_cat[:-11]}bars.png")
     plt.close()
     
 def main():
@@ -158,14 +154,21 @@ def main():
 
   df = pd.read_csv(src_csv_path, nrows=break_row -1, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
   # print(df.filter(regex="title|_views_speed").tail())
-  latest_data_show(df.filter(regex="title|(^date$)|_views_speed"), data_lim=(60000, None))
-  latest_data_show(df.filter(regex="title|(^date$)|_likes_speed"), data_lim=(3000, None))
-  latest_data_show(df.filter(regex="title|(^date$)|_comments_speed"), data_lim=(200, None))
-  df = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
+  latest_data_show(df.filter(regex="title|(^date$)|_views_speed"), data_lim=(None, None))
+  latest_data_show(df.filter(regex="title|(^date$)|_likes_speed"), data_lim=(None, None))
+  latest_data_show(df.filter(regex="title|(^date$)|_comments_speed"), data_lim=(None, None))
+  df2 = pd.read_csv(src_csv_path, skiprows=break_row, encoding="utf-8", parse_dates=True, index_col="id", date_format="%Y-%m-%d %H:%M:%S")
+
+
   # print(df.filter(regex="title|_views_speed").head())
-  top_data_show(df.filter(regex="title|(^view$)|_views_speed"))
-  top_data_show(df.filter(regex="title|(^view$)|_likes_speed"), data_lim=(8, None))
-  top_data_show(df.filter(regex="title|(^view$)|_comments_speed"), data_lim=(0.1, None))
+  top_data_show(df2.filter(regex="title|(^view$)|_views_speed"))
+  top_data_show(df2.filter(regex="title|(^view$)|_likes_speed"), data_lim=(8, None))
+  top_data_show(df2.filter(regex="title|(^view$)|_comments_speed"), data_lim=(0.1, None))
+  
+  df_merged = pd.concat([df, df2], join="inner") ## uncomment out this for merged rankings
+  ranking_hist(df, prefix="recent")
+  ranking_hist(df2, prefix="top")
+  ranking_hist(df_merged, prefix="merged")
 
 if __name__ == "__main__":
   main()
